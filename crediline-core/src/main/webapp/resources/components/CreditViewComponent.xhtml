@@ -1,0 +1,297 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:c="http://java.sun.com/jsp/jstl/core"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<composite:interface>
+    <composite:attribute name="credit" required="true"/>
+    <composite:attribute name="uniqueIndex" required="true"/>
+</composite:interface>
+
+<composite:implementation>
+
+<h:panelGrid id="summaryPG" columns="1" columnClasses="label, value" styleClass="grid"
+             style="width: 100%; height: 100%">
+<c:if test="${cc.attrs.credit != null}">
+<p:toolbar>
+    <p:toolbarGroup align="left" style="width: 100%">
+
+        <h:commandButton value="Print" type="button" icon="ui-icon-print">
+            <p:printer target="printArea_#{cc.attrs.uniqueIndex}"/>
+        </h:commandButton>
+
+    </p:toolbarGroup>
+</p:toolbar>
+
+<p:dialog id="displayDocumentDialog_#{cc.attrs.uniqueIndex}" header="#{msg['common.documentBlank']}"
+          widgetVar="documentPrintDialog"
+          resizable="true"
+          showEffect="fade" hideEffect="explode" style="width: auto; height: auto" closeOnEscape="true">
+    <h:panelGrid id="displayDocumentPanelGrid_#{cc.attrs.uniqueIndex}" columns="2" cellpadding="4"
+                 style="margin:0 auto;">
+
+        <p:editor id="templateSourceEditor_#{cc.attrs.uniqueIndex}" widgetVar="ttsEditor" width="800"
+                  height="500"
+                  value="#{documentDetailsMB.selectedDocument.source}"/>
+
+    </h:panelGrid>
+</p:dialog>
+
+<h:panelGrid id="printArea_#{cc.attrs.uniqueIndex}" columns="4" columnClasses="label, value">
+
+    <p:outputLabel value="#{msg['common.id']}" style="font-weight: bold"/>
+    <p:outputLabel value="#{cc.attrs.credit.id}"/>
+
+    <p:outputLabel value="#{msg['common.credit-sum']}" style="font-weight: bold"/>
+    <p:outputLabel
+            value="#{cc.attrs.credit.originalBasis} #{cc.attrs.credit.currency}"/>
+
+    <p:outputLabel value="#{msg['common.credit-time']}" style="font-weight: bold"/>
+    <p:outputLabel value="#{cc.attrs.credit.period} #{msg['common.months']}"/>
+
+    <p:outputLabel value="#{msg['common.credit-month-interest']}" style="font-weight: bold"/>
+    <p:outputLabel value="#{cc.attrs.credit.interest}">
+        <f:convertNumber type="percent" pattern="0.00%"/>
+    </p:outputLabel>
+
+    <p:outputLabel value="#{msg['common.issuedFrom']}" style="font-weight: bold"/>
+    <p:outputLabel value="#{cc.attrs.credit.createdBy.username}"/>
+
+    <p:outputLabel value="#{msg['common.credit.issuedAt']}" style="font-weight: bold"/>
+    <p:outputLabel value="#{cc.attrs.credit.pickUpDate.toString('dd/MM/yyyy HH:mm:ss')}"/>
+
+    <p:outputLabel value="#{msg['common.credit.issuedIn']}" style="font-weight: bold"/>
+    <p:outputLabel value="#{cc.attrs.credit.createdIn.name}"/>
+
+    <p:outputLabel value="#{msg['common.payment.due-date']}" style="font-weight: bold"/>
+    <p:outputLabel value="#{cc.attrs.credit.dueDate.toString('dd/MM/yyyy')}"/>
+
+    <p:outputLabel value="#{msg['common.applicationFee']}" style="font-weight: bold"/>
+    <p:outputLabel value="#{cc.attrs.credit.applicationFee}"/>
+
+    <p:outputLabel value="#{msg['common.credit-insurance-value']}" style="font-weight: bold"/>
+    <p:outputLabel value="#{cc.attrs.credit.insurance.sum}"/>
+
+    <p:outputLabel value="#{msg['common.credit.utilizedАmount']}" style="font-weight: bold"/>
+    <p:outputLabel value="#{cc.attrs.credit.originalBasis}"/>
+
+    <p:outputLabel value="#{msg['common.credit.returnAmount']}" style="font-weight: bold"/>
+    <p:outputLabel value="#{cc.attrs.credit.fullSum}"/>
+
+    <p:outputLabel value="#{msg['common.payment.interestSum']}" style="font-weight: bold"/>
+    <p:outputLabel value="#{cc.attrs.credit.interestSum}"/>
+
+    <p:outputLabel value="#{msg['common.payment.basisSum']}" style="font-weight: bold"/>
+    <p:outputLabel value="#{cc.attrs.credit.basis}"/>
+
+    <p:outputLabel value="#{msg['common.payment.returnedSum']}" style="font-weight: bold"/>
+    <p:outputLabel value="#{cc.attrs.credit.returnedSum}"/>
+
+    <p:outputLabel value="#{msg['common.payment.oustandingSum']}" style="font-weight: bold"/>
+    <p:outputLabel value="#{cc.attrs.credit.oustandingSum}"/>
+
+</h:panelGrid>
+
+<p:dataTable id="calculationSummaryTable_#{cc.attrs.uniqueIndex}" var="payment"
+             value="#{cc.attrs.credit.payments}" widgetVar="calculationSummaryTable_#{cc.attrs.uniqueIndex}">
+
+    <f:facet name="header">
+        #{msg['common.payments']}
+    </f:facet>
+
+    <p:column headerText="#{msg['common.id']}">
+        <h:outputText value="#{payment.id}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.basis']}">
+        <h:outputText value="#{payment.basis}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.interest']}">
+        <h:outputText value="#{payment.interest}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.insurance']}">
+        <h:outputText value="#{payment.insurance}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.sum']}">
+        <h:outputText value="#{payment.sum}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.payment.close-date']}">
+        <h:outputText value="#{payment.closedDate.toString('dd/MM/yyyy')}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.payment.due-date']}">
+        <h:outputText value="#{payment.dueDate.toString('dd/MM/yyyy')}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.payment.itWasInOverdue']}">
+        <h:outputText value="#{payment.itWasInOverdue}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.payment.isBilled']}">
+        <h:outputText value="#{payment.itWasInOverdue}"/>
+    </p:column>
+
+    <p:columnGroup type="footer">
+        <p:row>
+            <p:column colspan="4" footerText="Totals:"
+                      style="text-align:right"/>
+
+            <p:column footerText="#{cc.attrs.credit.fullSum}"/>
+        </p:row>
+    </p:columnGroup>
+</p:dataTable>
+
+<p:dataTable id="calculationSummaryTableIncomes_#{cc.attrs.uniqueIndex}" var="income"
+             value="#{cc.attrs.credit.incomes}"
+             widgetVar="calculationSummaryTableIncomes_#{cc.attrs.uniqueIndex}">
+
+    <f:facet name="header">
+        #{msg['common.incomes']}
+    </f:facet>
+
+    <p:column headerText="#{msg['common.credit.issuedAt']}">
+        <h:outputText value="#{income.creationDate.toString('dd/MM/yyyy hh:mm')}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.sum']}">
+        <h:outputText value="#{income.sum}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.credit.issuedIn']}">
+        <h:outputText value="#{income.createdIn.name}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.issuedFrom']}">
+        <h:outputText value="#{income.createdBy.username}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.type']}">
+        <h:outputText value="#{msg['common.transaction.paymentMethod.'.concat(income.paymentMethod)]}"/>
+    </p:column>
+
+</p:dataTable>
+
+
+<h:panelGrid columns="2" columnClasses="label, value"
+             styleClass="grid">
+    <p:outputLabel value="#{msg['common.menu.customer']}:" style="font-weight: bold"/>
+    <p:outputLabel
+            value="#{cc.attrs.credit.person.fullName}"/>
+    <p:outputLabel value="#{msg['common.egn']}:" style="font-weight: bold"/>
+    <p:outputLabel
+            value="#{cc.attrs.credit.person.egn}"/>
+    <p:outputLabel value="#{msg['common.contact.lkno']}:" style="font-weight: bold"/>
+    <p:outputLabel
+            value="#{cc.attrs.credit.person.lkNo}"/>
+
+    <h:outputText value="#{msg['common.status']}" style="font-weight: bold"/>
+    <p:rating value="#{cc.attrs.credit.person.rating}" stars="10"/>
+
+    <c:forEach items="#{cc.attrs.credit.person.addresses}" var="address">
+        <p:outputLabel value="#{msg['common.menu.address']}:" style="font-weight: bold"/>
+        <p:outputLabel value="#{address}"/>
+    </c:forEach>
+    <c:forEach items="#{cc.attrs.credit.person.phones}" var="phone">
+        <p:outputLabel value="#{msg['common.contacts.phone']}:" style="font-weight: bold"/>
+        <p:outputLabel value="#{phone}"/>
+    </c:forEach>
+</h:panelGrid>
+
+<c:if test="${cc.attrs.credit.guarantor1.id > 0}">
+    <h:panelGrid columns="2" columnClasses="label, value"
+                 styleClass="grid">
+        <p:outputLabel value="#{msg['common.credit-guarantor']}:" style="font-weight: bold"/>
+        <p:outputLabel
+                value="#{cc.attrs.credit.guarantor1.fullName}"/>
+        <p:outputLabel value="#{msg['common.egn']}:" style="font-weight: bold"/>
+        <p:outputLabel
+                value="#{cc.attrs.credit.guarantor1.egn}"/>
+        <p:outputLabel value="#{msg['common.contact.lkno']}:" style="font-weight: bold"/>
+        <p:outputLabel
+                value="#{cc.attrs.credit.guarantor1.lkNo}"/>
+        <h:outputText value="#{msg['common.status']}" style="font-weight: bold"/>
+        <p:rating value="#{cc.attrs.credit.guarantor1.rating}" stars="10"/>
+        <c:forEach items="#{cc.attrs.credit.guarantor1.addresses}" var="address">
+            <p:outputLabel value="#{msg['common.menu.address']}:" style="font-weight: bold"/>
+            <p:outputLabel value="#{address}"/>
+        </c:forEach>
+        <c:forEach items="#{cc.attrs.credit.guarantor1.phones}" var="phone">
+            <p:outputLabel value="#{msg['common.contacts.phone']}:" style="font-weight: bold"/>
+            <p:outputLabel value="#{phone}"/>
+        </c:forEach>
+    </h:panelGrid>
+</c:if>
+
+<c:if test="${cc.attrs.credit.guarantor2.id > 0}">
+    <h:panelGrid columns="2" columnClasses="label, value"
+                 styleClass="grid">
+        <p:outputLabel value="#{msg['common.credit-guarantor']}:" style="font-weight: bold"/>
+        <p:outputLabel
+                value="#{cc.attrs.credit.guarantor2.fullName}"/>
+        <p:outputLabel value="#{msg['common.egn']}:" style="font-weight: bold"/>
+        <p:outputLabel
+                value="#{cc.attrs.credit.guarantor2.egn}"/>
+        <p:outputLabel value="#{msg['common.contact.lkno']}:" style="font-weight: bold"/>
+        <p:outputLabel
+                value="#{cc.attrs.credit.guarantor2.lkNo}"/>
+        <h:outputText value="#{msg['common.status']}" style="font-weight: bold"/>
+        <p:rating value="#{cc.attrs.credit.guarantor2.rating}" stars="10"/>
+        <c:forEach items="#{cc.attrs.credit.guarantor2.addresses}" var="address">
+            <p:outputLabel value="#{msg['common.menu.address']}:" style="font-weight: bold"/>
+            <p:outputLabel value="#{address}"/>
+        </c:forEach>
+        <c:forEach items="#{cc.attrs.credit.guarantor2.phones}" var="phone">
+            <p:outputLabel value="#{msg['common.contacts.phone']}:" style="font-weight: bold"/>
+            <p:outputLabel value="#{phone}"/>
+        </c:forEach>
+    </h:panelGrid>
+</c:if>
+
+<p:outputLabel value="#{msg['common.documents']}:" style="font-weight: bold"/>
+<!--<h:panelGrid columns="2" columnClasses="label, value"
+             styleClass="grid">
+    <c:forEach items="#{cc.attrs.credit.documents}" var="document">
+        <p:outputLabel value="#{msg['common.id']}:" style="font-weight: bold"/>
+        <p:outputLabel value="#{document.id}"/>
+        <p:outputLabel value="#{msg['common.name']}:" style="font-weight: bold"/>
+        <p:outputLabel value="#{document.name}"/>
+        <p:outputLabel value="#{msg['common.location']}:" style="font-weight: bold"/>
+        <p:outputLabel value="#{document.location.name}"/>
+    </c:forEach>
+</h:panelGrid>-->
+
+<p:fieldset legend="#{msg['common.documents']}" style="margin-top: 10px; !important">
+    <h:panelGrid columns="2" columnClasses="label, value"
+                 styleClass="grid">
+        <c:forEach items="#{cc.attrs.credit.documents}" var="document">
+            <p:outputLabel value="#{msg['common.id']}:" style="font-weight: bold"/>
+            <p:outputLabel value="#{document.id}"/>
+            <p:outputLabel value="#{msg['common.name']}:" style="font-weight: bold"/>
+            <p:outputLabel value="#{document.name}"/>
+            <p:outputLabel/>
+            <p:commandButton icon="ui-icon-print"
+                             actionListener="#{documentDetailsMB.printDocument(document)}"
+                             oncomplete="PF('documentPrintDialog').show()"
+                             value="#{msg['common.print']}" ajax="true" process="@this"
+                             update="displayDocumentPanelGrid_#{cc.attrs.uniqueIndex}">
+            </p:commandButton>
+            <p:outputLabel value="#{msg['common.location']}:" style="font-weight: bold"/>
+            <p:outputLabel value="#{document.location.name}"/>
+        </c:forEach>
+
+    </h:panelGrid>
+</p:fieldset>
+
+</c:if>
+
+</h:panelGrid>
+
+</composite:implementation>
+
+</ui:component>

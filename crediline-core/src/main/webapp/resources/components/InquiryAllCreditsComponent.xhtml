@@ -1,0 +1,446 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:c="http://java.sun.com/jsp/jstl/core"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:components="http://java.sun.com/jsf/composite/components">
+
+<composite:interface>
+    <composite:attribute name="managedBean" required="true" type="com.crediline.mb.InquiryCreditsMB"/>
+    <composite:attribute name="uniqueIndex" required="true"/>
+</composite:interface>
+
+<composite:implementation>
+<h:panelGroup layout="block" style="float: left; width: 100%">
+
+<!--<p:ajaxStatus onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"/>
+
+<p:dialog modal="true" widgetVar="statusDialog" header="Status"
+          draggable="false" closable="false">
+    <p:graphicImage value="/design/ajaxloadingbar.gif" />
+</p:dialog>-->
+
+<h:form id="mainContactsForm_#{cc.attrs.uniqueIndex}" style="width: 100%">
+
+<p:hotkey bind="ctrl+shift+p" actionListener="#{cc.attrs.managedBean.printInPDF}"/>
+<p:hotkey bind="ctrl+p" actionListener="#{cc.attrs.managedBean.printInPDF}"/>
+<p:growl id="growl_#{cc.attrs.uniqueIndex}" showDetail="true" sticky="true"/>
+<p:messages id="messages_#{cc.attrs.uniqueIndex}" showDetail="true"/>
+
+<p:toolbar>
+    <f:facet name="left">
+        <p:commandButton id="searchBtn_#{cc.attrs.uniqueIndex}" title="#{msg['common.menu.search']}"
+                         icon="ui-icon-search"
+                         actionListener="#{cc.attrs.managedBean.search}"
+                         update="@form:resultDiv_#{cc.attrs.uniqueIndex}"/>
+        <!--<p:commandButton title="#{msg['common.print']}" icon="ui-icon-print"
+                         actionListener="#{cc.attrs.managedBean.printCredits}"
+                         oncomplete="PF('overDueCreditsTemplate_#{cc.attrs.uniqueIndex}').show()"
+                         update="@form:overdueCreditsPG_#{cc.attrs.uniqueIndex}"/>-->
+        <p:commandButton icon="ui-icon-arrowstop-1-s" value="PDF" title="#{msg['common.download']}"
+                         ajax="false">
+            <p:fileDownload value="#{cc.attrs.managedBean.printInPDF}"/>
+        </p:commandButton>
+    </f:facet>
+</p:toolbar>
+
+
+<h:panelGroup layout="block" style="height: 100%">
+<h:panelGroup layout="block" style="float: left; width: 25%; height: 100%">
+<h:panelGroup layout="block" style="clear: both; height: 100%">
+
+<p:fieldset legend="#{msg['common.personData']}" style="margin-top: 10px; margin-right: 10px">
+    <h:panelGrid columns="2" styleClass="grid">
+
+        <p:outputLabel for="personName_#{cc.attrs.uniqueIndex}"
+                       value="#{msg['common.name']}"/>
+        <p:inputText id="personName_#{cc.attrs.uniqueIndex}"
+                     value="#{cc.attrs.managedBean.personName}"/>
+
+        <p:outputLabel for="personMidname_#{cc.attrs.uniqueIndex}"
+                       value="#{msg['common.midname']}"/>
+        <p:inputText id="personMidname_#{cc.attrs.uniqueIndex}"
+                     value="#{cc.attrs.managedBean.personMidname}"/>
+
+        <p:outputLabel for="personSurname_#{cc.attrs.uniqueIndex}"
+                       value="#{msg['common.surname']}"/>
+        <p:inputText id="personSurname_#{cc.attrs.uniqueIndex}"
+                     value="#{cc.attrs.managedBean.personSurname}"/>
+
+        <p:outputLabel for="personEgn_#{cc.attrs.uniqueIndex}"
+                       value="#{msg['common.egn']}"/>
+        <p:inputText id="personEgn_#{cc.attrs.uniqueIndex}"
+                     value="#{cc.attrs.managedBean.personEgn}"/>
+
+    </h:panelGrid>
+</p:fieldset>
+
+<p:fieldset legend="#{msg['common.credit.issuedIn']}" style="margin-top: 10px; margin-right: 10px">
+    <h:panelGrid columns="2" styleClass="grid" style="width: 100%">
+
+        <h:outputText for="region_#{cc.attrs.uniqueIndex}"
+                      value="#{msg['common.menu.region']}"
+                      style="font-weight: bold" rendered="#{sessionMB.currentRole.contains('ROLE_SUPERADMIN')}"/>
+        <p:selectOneMenu id="region_#{cc.attrs.uniqueIndex}" required="false" tabindex="1"
+                         converter="#{regionConverter}" rendered="#{sessionMB.currentRole.contains('ROLE_SUPERADMIN')}"
+                         label="#{msg['common.menu.region']}"
+                         value="#{cc.attrs.managedBean.selectedRegion}">
+            <f:selectItem itemLabel="#{msg['common.all']}" noSelectionOption="true" itemValue="#{null}"/>
+            <f:selectItems value="#{autoComplete.allRegions}" var="region"
+                           itemLabel="#{region.name}"
+                           itemValue="#{region}"/>
+        </p:selectOneMenu>
+
+        <c:choose>
+            <c:when test="#{sessionMB.currentRole.contains('ROLE_SUPERADMIN')}">
+                <h:outputText for="officeReference_#{cc.attrs.uniqueIndex}"
+                              value="#{msg['common.menu.office']}"
+                              style="font-weight: bold"/>
+                <p:selectOneMenu id="officeReference_#{cc.attrs.uniqueIndex}" required="false"
+                                 tabindex="4" converter="#{officeConverter}"
+                                 label="#{msg['common.menu.office']}"
+                                 value="#{cc.attrs.managedBean.selectedOffice}">
+                    <f:selectItem itemLabel="#{msg['common.all']}" noSelectionOption="true" itemValue="#{null}"/>
+                    <f:selectItems value="#{autoComplete.allOffices}" var="office"
+                                   itemLabel="#{office.name}"
+                                   itemValue="#{office}"/>
+                </p:selectOneMenu>
+            </c:when>
+            <c:otherwise>
+                <h:outputText for="officeReference_#{cc.attrs.uniqueIndex}"
+                              value="#{msg['common.menu.office']}"
+                              style="font-weight: bold"/>
+                <p:selectOneMenu id="officeReference_#{cc.attrs.uniqueIndex}" required="false"
+                                 tabindex="4" converter="#{officeConverter}"
+                                 label="#{msg['common.menu.office']}"
+                                 value="#{cc.attrs.managedBean.selectedOffice}">
+                    <f:selectItems value="#{cc.attrs.managedBean.regionalOffices}" var="office"
+                                   itemLabel="#{office.name}"
+                                   itemValue="#{office}"/>
+                </p:selectOneMenu>
+            </c:otherwise>
+        </c:choose>
+
+        <h:outputText for="user_#{cc.attrs.uniqueIndex}"
+                      value="#{msg['common.issuedFrom']}"
+                      style="font-weight: bold"/>
+        <p:selectOneMenu id="user_#{cc.attrs.uniqueIndex}" required="false" tabindex="1"
+                         converter="#{userConverter}"
+                         label="#{msg['common.issuedFrom']}"
+                         value="#{cc.attrs.managedBean.issuer}">
+            <f:selectItem itemLabel="#{msg['common.all']}" noSelectionOption="true" itemValue="#{null}"/>
+            <f:selectItems value="#{autoComplete.allUsers}" var="user"
+                           itemLabel="#{user.username}"
+                           itemValue="#{user}"/>
+        </p:selectOneMenu>
+
+    </h:panelGrid>
+</p:fieldset>
+
+<p:fieldset legend="#{msg['common.credit.timeParameters']}" style="margin-top: 10px; margin-right: 10px">
+    <h:panelGrid columns="2" styleClass="grid">
+
+        <p:outputLabel for="issuedAfter_#{cc.attrs.uniqueIndex}"
+                       value="#{msg['common.credit.issuedAfter']}"/>
+        <p:calendar id="issuedAfter_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.issuedAfter}"
+                    pattern="dd/MM/yyyy" converter="dateConverter"
+                    showButtonPanel="true" navigator="true"
+                    mode="popup" showOn="button" popupIconOnly="true" tabindex="3"/>
+
+        <p:outputLabel for="issuedBefore_#{cc.attrs.uniqueIndex}"
+                       value="#{msg['common.credit.issuedBefore']}"/>
+        <p:calendar id="issuedBefore_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.issuedBefore}"
+                    pattern="dd/MM/yyyy" converter="dateConverter"
+                    showButtonPanel="true" navigator="true"
+                    mode="popup" showOn="button" popupIconOnly="true" tabindex="2"/>
+
+        <p:outputLabel for="inOverdueAfter_#{cc.attrs.uniqueIndex}"
+                       value="#{msg['common.credit.inOverdueAfter']}"/>
+        <p:calendar id="inOverdueAfter_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.inOverdueAfter}"
+                    pattern="dd/MM/yyyy" converter="dateConverter"
+                    showButtonPanel="true" navigator="true"
+                    mode="popup" showOn="button" popupIconOnly="true" tabindex="3"/>
+
+        <p:outputLabel for="inOverdueBefore_#{cc.attrs.uniqueIndex}"
+                       value="#{msg['common.credit.inOverdueBefore']}"/>
+        <p:calendar id="inOverdueBefore_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.inOverdueBefore}"
+                    pattern="dd/MM/yyyy" converter="dateConverter"
+                    showButtonPanel="true" navigator="true"
+                    mode="popup" showOn="button" popupIconOnly="true" tabindex="2"/>
+
+    </h:panelGrid>
+</p:fieldset>
+
+<p:fieldset legend="#{msg['common.location']}" style="margin-top: 10px; margin-right: 10px">
+    <h:panelGrid columns="2" styleClass="grid">
+        <p:outputLabel for="city_#{cc.attrs.uniqueIndex}" value="#{msg['common.city']}"/>
+        <p:autoComplete id="city_#{cc.attrs.uniqueIndex}" required="false"
+                        cache="true" cacheTimeout="6000" tabindex="5"
+                        label="#{msg['common.city']}" panelStyle="width:600px" queryDelay="1000"
+                        value="#{cc.attrs.managedBean.selectedCity}"
+                        converter="#{cityConverter}"
+                        completeMethod="#{autoComplete.autoCompleteCities}" maxResults="10"
+                        effect="fade"
+                        var="c" itemValue="#{c}" itemLabel="#{c.name}">
+            <p:column>
+                #{c.name}
+            </p:column>
+
+            <p:column>
+                #{c.oblast}
+            </p:column>
+
+            <p:column>
+                #{c.obshtina}
+            </p:column>
+
+        </p:autoComplete>
+
+        <p:outputLabel for="steet_#{cc.attrs.uniqueIndex}" value="#{msg['common.street']}"/>
+        <p:autoComplete id="steet_#{cc.attrs.uniqueIndex}" required="false"
+                        label="#{msg['common.street']}"
+                        cache="true" cacheTimeout="6000" tabindex="6"
+                        value="#{cc.attrs.managedBean.selectedStreet}"
+                        converter="#{streetConverter}"
+                        completeMethod="#{autoComplete.autoCompleteStreets}" maxResults="10"
+                        effect="fade"
+                        var="s" itemValue="#{s}" itemLabel="#{s.name}">
+            <p:column>
+                #{s.name}
+            </p:column>
+        </p:autoComplete>
+
+        <p:outputLabel for="steetNo_#{cc.attrs.uniqueIndex}" value="#{msg['common.number']}"/>
+        <p:inputText id="steetNo_#{cc.attrs.uniqueIndex}" required="false" label="#{msg['common.number']}" tabindex="7"
+                     value="#{cc.attrs.managedBean.selectedNumber}">
+        </p:inputText>
+
+        <p:outputLabel for="province_#{cc.attrs.uniqueIndex}"
+                       value="#{msg['common.province']}"/>
+        <p:autoComplete id="province_#{cc.attrs.uniqueIndex}" required="false"
+                        label="#{msg['common.province']}"
+                        cache="true" cacheTimeout="6000" tabindex="8"
+                        value="#{cc.attrs.managedBean.selectedProvince}"
+                        converter="#{provinceConverter}"
+                        completeMethod="#{autoComplete.autoCompleteProvinces}" maxResults="10"
+                        effect="fade"
+                        var="s" itemValue="#{s}" itemLabel="#{s.name}">
+            <p:column>
+                #{s.name}
+            </p:column>
+        </p:autoComplete>
+    </h:panelGrid>
+</p:fieldset>
+
+<p:fieldset legend="#{msg['common.additional']}" style="margin-top: 10px; margin-right: 10px">
+    <h:panelGrid columns="2" styleClass="grid">
+
+        <p:outputLabel for="creditIdSelector_#{cc.attrs.uniqueIndex}"
+                       value="#{msg['common.id']}"/>
+        <p:inputText id="creditIdSelector_#{cc.attrs.uniqueIndex}"
+                     value="#{cc.attrs.managedBean.creditId}"/>
+
+        <p:outputLabel for="creditStateSelector_#{cc.attrs.uniqueIndex}"
+                       value="#{msg['common.status']}"/>
+        <h:selectOneMenu id="creditStateSelector_#{cc.attrs.uniqueIndex}"
+                         value="#{cc.attrs.managedBean.creditState}">
+            <f:selectItem itemLabel="#{msg['common.all']}" noSelectionOption="true" itemValue="#{null}"/>
+            <f:selectItems
+                    value="#{data.creditStates}"
+                    var="creditState"
+                    itemValue="#{creditState}"
+                    itemLabel="#{msg['common.realCreditState.'.concat(creditState)]}"/>
+        </h:selectOneMenu>
+
+        <p:outputLabel for="halfPayments_#{cc.attrs.uniqueIndex}"
+                       value="#{msg['common.withHalfPayments']}"/>
+        <p:selectBooleanCheckbox id="halfPayments_#{cc.attrs.uniqueIndex}" tabindex="9"
+                                 value="#{cc.attrs.managedBean.withHalfPayments}"/>
+
+    </h:panelGrid>
+</p:fieldset>
+<p:commandButton title="#{msg['common.menu.search']}" icon="ui-icon-search"
+                 actionListener="#{cc.attrs.managedBean.search}" tabindex="9"
+                 value="#{msg['common.menu.search']}" style="margin-top: 10px"
+                 update="@form"/>
+</h:panelGroup>
+</h:panelGroup>
+<h:panelGroup layout="block" style="margin-top: 13px; float: left; width: 75%; height: 100%">
+    <h:panelGroup id="resultDiv_#{cc.attrs.uniqueIndex}" layout="block" style="clear: both; height: 100%">
+        <h:outputText style="margin: 20px 10px 15px;"
+                      value="#{msg['common.countResults']}: #{cc.attrs.managedBean.result.size()}"/>
+        <p:dataTable var="credit" value="#{cc.attrs.managedBean.result}" scrollRows="30" lazy="true"
+                     rowKey="#{credit.id}" selection="#{cc.attrs.managedBean.sCredit}"
+                     selectionMode="single" scrollable="true" liveScroll="true" scrollHeight="780"
+                     rowStyleClass="#{credit.creditState eq 'OVERDUE' ? 'overdueCreditStyle' : null}"
+                     id="tableResult_#{cc.attrs.uniqueIndex}" widgetVar="resultTable_#{cc.attrs.uniqueIndex}">
+
+            <p:column headerText="ID" sortBy="#{credit.id}" width="55">
+                <h:outputText value="#{credit.id}"/>
+            </p:column>
+
+            <p:column headerText="#{msg['common.menu.customer']}">
+                <p:commandLink update="@form:personDetailsPanelGrig_#{cc.attrs.uniqueIndex}"
+                               oncomplete="PF('personDetailsDialog_#{cc.attrs.uniqueIndex}').show()">
+                    <f:setPropertyActionListener value="#{credit.person}"
+                                                 target="#{cc.attrs.managedBean.selectedPerson}"/>
+                    <h:outputText value="#{credit.person.fullName}"/>
+                </p:commandLink>
+            </p:column>
+
+            <p:column headerText="#{msg['common.egn']}" sortBy="person.egn" width="80">
+                <p:commandLink update="@form:personDetailsPanelGrig_#{cc.attrs.uniqueIndex}"
+                               oncomplete="PF('personDetailsDialog_#{cc.attrs.uniqueIndex}').show()">
+                    <f:setPropertyActionListener value="#{credit.person}"
+                                                 target="#{cc.attrs.managedBean.selectedPerson}"/>
+                    <h:outputText value="#{credit.person.egn}"/>
+                </p:commandLink>
+            </p:column>
+
+            <p:column headerText="#{msg['common.credit.issuedAt']}" width="110">
+                <h:outputText value="#{credit.creationDate.toString('dd/MM/yyyy')}"/>
+            </p:column>
+
+            <!--<p:column headerText="#{msg['common.credit.issuedAt']}">
+                #{credit.pickUpDate }
+            </p:column>
+
+            <p:column headerText="#{msg['common.credit.issuedFrom']}">
+                #{credit.issuer.username}
+            </p:column>
+
+            <p:column headerText="#{msg['common.credit.issuedIn']}">
+                #{credit.issuedIn.name}
+            </p:column>-->
+
+            <p:column headerText="#{msg['common.basis']}" width="70">
+                #{credit.basis}
+            </p:column>
+
+            <p:column headerText="#{msg['common.interest']}" width="70">
+                <h:outputText value="#{credit.interest}">
+                    <f:convertNumber type="percent" pattern="0.00%"/>
+                </h:outputText>
+            </p:column>
+
+            <p:column headerText="#{msg['common.payment.returnedSum']}">
+                #{credit.returnedSum}
+            </p:column>
+
+            <p:column headerText="#{msg['common.outstanding-payment-sum']}">
+                #{credit.oustandingSum}
+            </p:column>
+
+            <p:column headerText="#{msg['common.status']}" width="60">
+                <h:outputText value="#{msg['common.realCreditState.'.concat(credit.creditState)]}"/>
+            </p:column>
+
+            <p:column width="30">
+                <p:commandButton id="selectCreditButton_#{cc.attrs.uniqueIndex}"
+                                 update="@form:creditDetailsPG_#{cc.attrs.uniqueIndex}"
+                                 oncomplete="PF('creditDetails_#{cc.attrs.uniqueIndex}').show()" icon="ui-icon-search"
+                                 title="View">
+                    <f:setPropertyActionListener value="#{credit}" target="#{cc.attrs.managedBean.selectedCredit}"/>
+                </p:commandButton>
+            </p:column>
+
+        </p:dataTable>
+    </h:panelGroup>
+</h:panelGroup>
+</h:panelGroup>
+
+<p:contextMenu for="tableResult_#{cc.attrs.uniqueIndex}">
+    <p:menuitem value="#{msg['common.credit.invalidate']}" ajax="true" icon="ui-icon-close"
+                oncomplete="PF('reasonDialog').show()"/>
+    <p:menuitem value="#{msg['common.delete']}" ajax="true" icon="ui-icon-close"
+                onclick="PF('deleteCredit').show()" rendered="#{sessionMB.currentRole.contains('ROLE_SUPERADMIN')}"/>
+</p:contextMenu>
+
+<p:confirmDialog global="true" message="#{msg['common.areusure']}" showEffect="fade" hideEffect="explode"
+                 widgetVar="deleteCredit">
+    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check">
+        <p:ajax listener="#{cc.attrs.managedBean.deleteCredit}" update="@form" oncomplete="PF('deleteCredit').hide()"/>
+    </p:commandButton>
+    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"
+                     onclick="PF('deleteCredit').hide()"/>
+</p:confirmDialog>
+
+<p:dialog header="#{msg['common.reason.dialog.header']}" widgetVar="reasonDialog" modal="false" showEffect="fade"
+          hideEffect="explode" resizable="true">
+    <h:panelGrid id="reasonPanel_#{cc.attrs.uniqueIndex}" columns="1">
+        <p:inputTextarea rows="10" cols="50" value="#{cc.attrs.managedBean.invalidationReason}" queryDelay="750"
+                         minQueryLength="4"/>
+        <p:commandButton id="invalidateButton_#{cc.attrs.uniqueIndex}" ajax="true"
+                         update="@form:tableResult_#{cc.attrs.uniqueIndex}, @form:reasonPanel_#{cc.attrs.uniqueIndex}"
+                         oncomplete="PF('reasonDialog').hide()" value="#{msg['common.credit.invalidate']}"
+                         actionListener="#{cc.attrs.managedBean.invalidate}"/>
+    </h:panelGrid>
+</p:dialog>
+
+<p:dialog header="#{msg['common.overdueCredits']}" widgetVar="overDueCreditsTemplate_#{cc.attrs.uniqueIndex}"
+          resizable="true"
+          showEffect="fade" hideEffect="explode" width="1000" height="670" closeOnEscape="true">
+
+    <h:panelGrid id="overdueCreditsPG_#{cc.attrs.uniqueIndex}" columns="2" cellpadding="4" style="margin:0 auto;">
+
+        <f:facet name="header">
+            #{msg['common.overdueCredits']}
+        </f:facet>
+
+        <h:panelGrid columns="1" style="width: 100%; margin-top: 10px">
+            <p:editor id="overdueCreditsEditor_#{cc.attrs.uniqueIndex}"
+                      widgetVar="overdueCreditsEditor_#{cc.attrs.uniqueIndex}" height="600"
+                      style="width: 842px; height: 595px; margin-left: auto; margin-right: auto;"
+                      value="#{cc.attrs.managedBean.overdueCreditsDocument.source}"/>
+        </h:panelGrid>
+
+    </h:panelGrid>
+
+</p:dialog>
+
+<p:dialog id="dialogDetails_#{cc.attrs.uniqueIndex}" header="#{msg['common.details']}"
+          widgetVar="creditDetails_#{cc.attrs.uniqueIndex}" maximizable="true" minimizable="true"
+          resizable="true" showEffect="fade" hideEffect="explode" width="1000" height="670" closeOnEscape="true"
+          dynamic="true">
+
+    <h:panelGrid id="creditDetailsPG_#{cc.attrs.uniqueIndex}" columns="2" cellpadding="4" style="margin:0 auto;">
+        <components:CreditViewComponent uniqueIndex="#{cc.attrs.uniqueIndex}"
+                                        credit="#{cc.attrs.managedBean.selectedCredit}"/>
+    </h:panelGrid>
+
+</p:dialog>
+
+<p:dialog id="personDetailsDialog_#{cc.attrs.uniqueIndex}" header="#{msg['common.details']}"
+          widgetVar="personDetailsDialog_#{cc.attrs.uniqueIndex}" maximizable="true" minimizable="true"
+          resizable="true" showEffect="fade" hideEffect="explode" style="width: auto; height: 600px"
+          closeOnEscape="true"
+          dynamic="true">
+
+    <h:panelGroup layout="block" id="personDetailsPanelGrig_#{cc.attrs.uniqueIndex}"
+                  style="width: 1000px; height: 600px">
+        <components:PersonDetailViewComponent uniqueIndex="#{cc.attrs.uniqueIndex}"
+                                              person="#{cc.attrs.managedBean.selectedPerson}"
+                                              managedBean="#{cc.attrs.managedBean}"/>
+    </h:panelGroup>
+</p:dialog>
+
+<!--<h:panelGroup layout="block" style="clear: both; width: 100%; margin-top: 10px">
+    <p:toolbar>
+        <f:facet name="left">
+            <p:commandButton title="#{msg['common.menu.search']}" icon="ui-icon-search"
+                             actionListener="#{cc.attrs.managedBean.search}"
+                             update="@form:resultDiv_#{cc.attrs.uniqueIndex}"/>
+            <p:commandButton title="#{msg['common.print']}" icon="ui-icon-print"
+                             actionListener="#{cc.attrs.managedBean.printCredits}"
+                             oncomplete="PF('overDueCreditsTemplate_#{cc.attrs.uniqueIndex}').show()"
+                             update="@form:overdueCreditsPG_#{cc.attrs.uniqueIndex}"/>
+        </f:facet>
+    </p:toolbar>
+</h:panelGroup>-->
+<p:defaultCommand target="searchBtn_#{cc.attrs.uniqueIndex}"/>
+</h:form>
+
+</h:panelGroup>
+</composite:implementation>
+
+</ui:component>

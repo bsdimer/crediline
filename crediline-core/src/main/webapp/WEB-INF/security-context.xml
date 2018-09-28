@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:sec="http://www.springframework.org/schema/security"
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+          http://www.springframework.org/schema/security
+          http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <sec:http pattern="/css/**" security="none"/>
+    <sec:http pattern="/img/**" security="none"/>
+    <sec:http pattern="/js/**" security="none"/>
+    <sec:http pattern="/lib/**" security="none"/>
+    <sec:http pattern="*.jnlp" security="none"/>
+    <sec:http pattern="*.jar" security="none"/>
+
+    <sec:http auto-config="true" use-expressions="true">
+        <sec:intercept-url pattern="/superAdminView.xhtml" access="hasRole('ROLE_SUPERADMIN')"/>
+        <sec:intercept-url pattern="/userView.xhtml" access="hasRole('ROLE_USER')"/>
+        <sec:intercept-url pattern="/adminView.xhtml" access="hasRole('ROLE_ADMIN')"/>
+
+        <sec:intercept-url pattern="/login.xhtml" access="permitAll"/>
+        <sec:intercept-url pattern="/**" access="permitAll"/>
+        <sec:form-login login-page="/"
+                        authentication-failure-handler-ref="loginFailureHandler"
+                        authentication-success-handler-ref="loginSuccessHandler"/>
+        <sec:logout
+                invalidate-session="true"
+                delete-cookies="JSESSIONID,SPRING_SECURITY_REMEMBER_ME_COOKIE"
+                logout-success-url="/"/>
+        <sec:custom-filter ref="authenticationFilter" after="FORM_LOGIN_FILTER"/>
+        <sec:session-management>
+            <!--<sec:concurrency-control error-if-maximum-exceeded="true"/>-->
+        </sec:session-management>
+    </sec:http>
+
+    <sec:authentication-manager alias="authenticationManager">
+        <sec:authentication-provider user-service-ref="customUserDetailService"/>
+    </sec:authentication-manager>
+
+    <sec:global-method-security pre-post-annotations="enabled"/>
+
+    <beans:bean id="customUserDetailService" class="com.crediline.security.CustomUserDetailsService"/>
+    <beans:bean id="loginSuccessHandler" class="com.crediline.security.LoginSuccessHandler"/>
+    <beans:bean id="loginFailureHandler" class="com.crediline.security.LoginFailureHandler"/>
+    <beans:bean id="authenticationFilter" class="com.crediline.security.CustomAuthenticationFilter">
+        <beans:property name="authenticationManager" ref="authenticationManager"/>
+    </beans:bean>
+
+    <!-- Listeners -->
+    <beans:bean id="authenticationSuccessListener" class="com.crediline.security.events.AuthenticationSuccessListener"/>
+    <beans:bean id="authenticationFailListener" class="com.crediline.security.events.AuthenticationFailListener"/>
+    <beans:bean id="authenticationListener" class="com.crediline.security.events.ApplicationContextListener"/>
+
+</beans:beans>

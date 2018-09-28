@@ -1,0 +1,15 @@
+.panel-grid-top-aligned td {
+	vertical-align: top;
+}
+
+.pink-background {
+	background-color: pink;
+}
+
+.white-background {
+	background-color: white;
+}
+
+.credit-register-table {
+	font-size: 10px !important;
+}

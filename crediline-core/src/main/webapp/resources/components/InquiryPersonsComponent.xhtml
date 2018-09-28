@@ -1,0 +1,310 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:c="http://java.sun.com/jsp/jstl/core"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:components="http://java.sun.com/jsf/composite/components">
+
+<composite:interface>
+    <composite:attribute name="managedBean" required="true" type="com.crediline.mb.InquiryPersonsMB"/>
+    <composite:attribute name="uniqueIndex" required="true"/>
+</composite:interface>
+
+<composite:implementation>
+<h:panelGroup layout="block" style="float: left; width: 100%">
+
+<h:form id="mainContactsForm_#{cc.attrs.uniqueIndex}" style="width: 100%" prependId="false">
+
+<style type="text/css">
+    .blockedPersonStyle {
+        background: red !important;
+    }
+</style>
+
+<p:defaultCommand target="searchBtn_#{cc.attrs.uniqueIndex}"/>
+<p:growl id="growl_#{cc.attrs.uniqueIndex}" showDetail="true" sticky="true"/>
+<p:messages id="messages_#{cc.attrs.uniqueIndex}" showDetail="true"/>
+
+<p:toolbar>
+    <f:facet name="left">
+        <p:commandButton id="searchBtn_#{cc.attrs.uniqueIndex}" title="#{msg['common.menu.search']}"
+                         icon="ui-icon-search"
+                         actionListener="#{cc.attrs.managedBean.search}"
+                         update="@form:resultDiv_#{cc.attrs.uniqueIndex}"/>
+        <p:commandButton title="#{msg['common.print']}" icon="ui-icon-print">
+            <!--<p:printer target="mainContainer_#{cc.attrs.uniqueIndex}"/>-->
+        </p:commandButton>
+    </f:facet>
+</p:toolbar>
+
+
+<h:panelGroup layout="block" id="mainContainer_#{cc.attrs.uniqueIndex}"
+              style="height: 100%">
+<h:panelGroup layout="block" style="float: left; width: 25%; height: 100%">
+    <h:panelGroup layout="block" style="clear: both; height: 100%">
+
+        <p:fieldset legend="#{msg['common.main']}" style="margin-top: 10px; margin-right: 10px">
+            <h:panelGrid columns="2" styleClass="grid">
+
+                <p:outputLabel for="personName_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.name']}"/>
+                <p:inputText id="personName_#{cc.attrs.uniqueIndex}"
+                             value="#{cc.attrs.managedBean.person.name}"/>
+
+                <p:outputLabel for="personMidname_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.midname']}"/>
+                <p:inputText id="personMidname_#{cc.attrs.uniqueIndex}"
+                             value="#{cc.attrs.managedBean.person.midname}"/>
+
+                <p:outputLabel for="personSurname_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.surname']}"/>
+                <p:inputText id="personSurname_#{cc.attrs.uniqueIndex}"
+                             value="#{cc.attrs.managedBean.person.surname}"/>
+
+                <p:outputLabel for="personEgn_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.egn']}"/>
+                <p:inputText id="personEgn_#{cc.attrs.uniqueIndex}"
+                             value="#{cc.attrs.managedBean.person.egn}"/>
+
+            </h:panelGrid>
+        </p:fieldset>
+
+        <p:fieldset legend="#{msg['common.location']}" style="margin-top: 10px; margin-right: 10px">
+            <h:panelGrid columns="2" styleClass="grid">
+                <p:outputLabel for="city_#{cc.attrs.uniqueIndex}" value="#{msg['common.city']}"/>
+                <p:autoComplete id="city_#{cc.attrs.uniqueIndex}" required="false"
+                                cache="true" cacheTimeout="6000" tabindex="5"
+                                label="#{msg['common.city']}" panelStyle="width:600px"
+                                queryDelay="1000"
+                                value="#{cc.attrs.managedBean.selectedCity}"
+                                converter="#{cityConverter}"
+                                completeMethod="#{autoComplete.autoCompleteCities}" maxResults="10"
+                                effect="fade"
+                                var="c" itemValue="#{c}" itemLabel="#{c.name}">
+                    <p:column>}
+                        #{c.name}
+                    </p:column>
+
+                    <p:column>
+                        #{c.oblast}
+                    </p:column>
+
+                    <p:column>
+                        #{c.obshtina}
+                    </p:column>
+
+                </p:autoComplete>
+
+                <p:outputLabel for="street_#{cc.attrs.uniqueIndex}" value="#{msg['common.street']}"/>
+                <p:autoComplete id="street_#{cc.attrs.uniqueIndex}" required="false"
+                                label="#{msg['common.street']}"
+                                cache="true" cacheTimeout="6000" tabindex="6"
+                                value="#{cc.attrs.managedBean.selectedStreet}"
+                                converter="#{streetConverter}"
+                                completeMethod="#{autoComplete.autoCompleteStreets}" maxResults="10"
+                                effect="fade"
+                                var="s" itemValue="#{s}" itemLabel="#{s.name}">
+                    <p:column>
+                        #{s.name}
+                    </p:column>
+                </p:autoComplete>
+
+                <p:outputLabel for="province_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.province']}"/>
+                <p:autoComplete id="province_#{cc.attrs.uniqueIndex}" required="false"
+                                label="#{msg['common.province']}"
+                                cache="true" cacheTimeout="6000" tabindex="7"
+                                value="#{cc.attrs.managedBean.selectedProvince}"
+                                converter="#{provinceConverter}"
+                                completeMethod="#{autoComplete.autoCompleteProvinces}"
+                                maxResults="10"
+                                effect="fade"
+                                var="s" itemValue="#{s}" itemLabel="#{s.name}">
+                    <p:column>
+                        #{s.name}
+                    </p:column>
+                </p:autoComplete>
+            </h:panelGrid>
+        </p:fieldset>
+
+        <p:fieldset legend="#{msg['common.credit.timeParameters']}"
+                    style="margin-top: 10px; margin-right: 10px">
+            <h:panelGrid columns="2" styleClass="grid">
+
+                <p:outputLabel for="issuedAfter_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.credit.issuedAfter']}"/>
+                <p:calendar id="issuedAfter_#{cc.attrs.uniqueIndex}"
+                            value="#{cc.attrs.managedBean.issuedAfter}"
+                            pattern="dd/MM/yyyy" converter="dateConverter"
+                            showButtonPanel="true" navigator="true"
+                            mode="popup" showOn="button" popupIconOnly="true" tabindex="3"/>
+
+                <p:outputLabel for="issuedBefore_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.credit.issuedBefore']}"/>
+                <p:calendar id="issuedBefore_#{cc.attrs.uniqueIndex}"
+                            value="#{cc.attrs.managedBean.issuedBefore}"
+                            pattern="dd/MM/yyyy" converter="dateConverter"
+                            showButtonPanel="true" navigator="true"
+                            mode="popup" showOn="button" popupIconOnly="true" tabindex="2"/>
+
+            </h:panelGrid>
+        </p:fieldset>
+
+        <p:fieldset legend="#{msg['common.additional']}" style="margin-top: 10px; margin-right: 10px">
+            <h:panelGrid columns="2" styleClass="grid">
+
+                <p:outputLabel for="personRating_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.rating']}"/>
+                <h:panelGroup layout="block">
+                    <p:selectOneMenu value="#{cc.attrs.managedBean.rangeSelector}">
+                        <f:selectItem itemLabel="#{msg['common.equal']}" itemValue="eq"/>
+                        <f:selectItem itemLabel="#{msg['common.greaterThan']}" itemValue="gt"/>
+                        <f:selectItem itemLabel="#{msg['common.lessThan']}" itemValue="lt"/>
+                    </p:selectOneMenu>
+                    <p:rating id="personRating_#{cc.attrs.uniqueIndex}" stars="10"
+                              value="#{cc.attrs.managedBean.person.rating}"/>
+                </h:panelGroup>
+
+            </h:panelGrid>
+        </p:fieldset>
+
+        <p:commandButton title="#{msg['common.menu.search']}" icon="ui-icon-search"
+                         actionListener="#{cc.attrs.managedBean.search}" tabindex="9"
+                         value="#{msg['common.menu.search']}"
+                         style="margin-top: 10px; margin-bottom: 20px"
+                         update="@form"/>
+    </h:panelGroup>
+</h:panelGroup>
+<h:panelGroup layout="block" style="margin-top: 13px; float: left; width: 75%; height: 100%">
+
+    <h:panelGroup id="resultDiv_#{cc.attrs.uniqueIndex}" layout="block"
+                  style="clear: both; height: 100%">
+        <h:outputText style="margin: 20px 10px 15px;"
+                      value="#{msg['common.countResults']}: #{cc.attrs.managedBean.result.size()}"/>
+        <p:dataTable var="person" value="#{cc.attrs.managedBean.result}" scrollRows="20"
+                     scrollable="true" liveScroll="true" scrollHeight="570"
+                     rowKey="#{person.id}" selection="#{cc.attrs.managedBean.sPerson}"
+                     selectionMode="single"
+                     lazy="true" style="margin-bottom: 10px"
+                     id="tableResult_#{cc.attrs.uniqueIndex}"
+                     widgetVar="resultTable_#{cc.attrs.uniqueIndex}"
+                     filteredValue="#{cc.attrs.managedBean.filteredPersons}">
+
+            <p:column headerText="ID" width="5%" sortBy="#{person.id}">
+                <h:outputText value="#{person.id}"/>
+            </p:column>
+
+            <p:column headerText="#{msg['common.fullname']}" sortBy="fullName" style="width:170px">
+                <h:outputText value="#{person.fullName}"/>
+            </p:column>
+
+            <p:column headerText="#{msg['common.egn']}" sortBy="egn" style="width:80px">
+                <h:outputText value="#{person.egn}"/>
+            </p:column>
+
+            <p:column headerText="#{msg['common.menu.address']}" style="width: auto !important;">
+                <h:outputText value="#{person.addresses[0]}"/>
+            </p:column>
+
+            <p:column headerText="#{msg['common.comments']}">
+                <c:if test="${person.comments.size() > 0}">
+                    <h:outputText value="#{person.comments[0]}"/>
+                </c:if>
+            </p:column>
+
+            <p:column headerText="#{msg['common.rating']}" style="width: 180px" sortBy="rating">
+                <p:rating stars="10" value="#{person.rating}" readonly="true"/>
+            </p:column>
+
+            <p:column style="width:30px">
+                <p:commandButton id="selectPersonButton_#{cc.attrs.uniqueIndex}"
+                                 update="@form:personDetailsPG_#{cc.attrs.uniqueIndex}"
+                                 oncomplete="PF('dialogDetailsPerson_#{cc.attrs.uniqueIndex}').show()"
+                                 icon="ui-icon-search"
+                                 title="View">
+                    <f:setPropertyActionListener value="#{person}" target="#{cc.attrs.managedBean.selectedPerson}"/>
+                </p:commandButton>
+            </p:column>
+
+            <p:column style="width:30px">
+                <p:commandButton id="editPersonButton_#{cc.attrs.uniqueIndex}"
+                                 update="@form:editPersonPG_#{cc.attrs.uniqueIndex}"
+                                 oncomplete="PF('editPersonDialog_#{cc.attrs.uniqueIndex}').show()"
+                                 icon="ui-icon-pencil"
+                                 title="Edit">
+                    <f:setPropertyActionListener value="#{person}" target="#{cc.attrs.managedBean.selectedPerson}"/>
+                </p:commandButton>
+            </p:column>
+
+            <!--<p:column headerText="#{msg['common.credit.issuedAt']}" sortBy="creationDate">
+                <h:outputText value="#{person.creationDate.toString('dd/MM/yyyy')}"/>
+            </p:column>
+
+            <p:column headerText="#{msg['common.issuedFrom']}" sortBy="createdBy">
+                <h:outputText value="#{person.createdBy.username}"/>
+            </p:column>-->
+
+        </p:dataTable>
+    </h:panelGroup>
+</h:panelGroup>
+</h:panelGroup>
+
+<p:contextMenu for="tableResult_#{cc.attrs.uniqueIndex}">
+    <p:menuitem value="#{msg['common.add.comment']}" ajax="true" icon="ui-icon-close"
+                oncomplete="PF('commentDialog').show()"/>
+</p:contextMenu>
+
+<p:dialog header="#{msg['common.add.comment']}" widgetVar="commentDialog" modal="false" showEffect="fade"
+          hideEffect="explode" resizable="true">
+    <h:panelGrid id="commentPanel_#{cc.attrs.uniqueIndex}" columns="1">
+        <p:inputTextarea rows="10" cols="50" value="#{cc.attrs.managedBean.comment}" queryDelay="750"
+                         minQueryLength="4"/>
+        <p:commandButton id="addCommentButton_#{cc.attrs.uniqueIndex}" ajax="true"
+                         update="@form:commentPanel_#{cc.attrs.uniqueIndex}" oncomplete="PF('commentDialog').hide()"
+                         value="#{msg['common.add']}" actionListener="#{cc.attrs.managedBean.addComment}"/>
+    </h:panelGrid>
+</p:dialog>
+
+<p:dialog id="dialogDetailsPerson_#{cc.attrs.uniqueIndex}" header="#{msg['common.details']}"
+          widgetVar="dialogDetailsPerson_#{cc.attrs.uniqueIndex}"
+          resizable="true" showEffect="fade" hideEffect="explode" width="1000" height="550"
+          closeOnEscape="true"
+          dynamic="true">
+
+    <h:panelGroup layout="block" id="personDetailsPG_#{cc.attrs.uniqueIndex}">
+        <components:PersonDetailViewComponent uniqueIndex="#{cc.attrs.uniqueIndex}"
+                                              person="#{cc.attrs.managedBean.selectedPerson}"
+                                              managedBean="#{cc.attrs.managedBean}"/>
+    </h:panelGroup>
+</p:dialog>
+
+<p:dialog id="editPersonDialog_#{cc.attrs.uniqueIndex}" header="#{msg['common.details']}"
+          widgetVar="editPersonDialog_#{cc.attrs.uniqueIndex}"
+          resizable="true" showEffect="fade" hideEffect="explode" width="890" height="670"
+          closeOnEscape="true"
+          dynamic="true">
+
+    <h:panelGroup layout="block" id="editPersonPG_#{cc.attrs.uniqueIndex}">
+        <components:EditPersonComponent uniqueIndex="#{cc.attrs.uniqueIndex}"
+                                        managedBean="#{cc.attrs.managedBean.updatePersonBean}"/>
+    </h:panelGroup>
+</p:dialog>
+
+<!--<h:panelGroup layout="block" style="clear: both; width: 100%; margin-top: 20px">
+    <p:toolbar>
+        <f:facet name="left">
+            <p:commandButton title="#{msg['common.menu.search']}" icon="ui-icon-search"
+                             actionListener="#{cc.attrs.managedBean.search}"
+                             update="@form:resultDiv_#{cc.attrs.uniqueIndex}"/>
+            <p:commandButton title="#{msg['common.print']}" icon="ui-icon-print">
+                <p:printer target="mainContainer_#{cc.attrs.uniqueIndex}"/>
+            </p:commandButton>
+        </f:facet>
+    </p:toolbar>
+</h:panelGroup>
+-->
+</h:form>
+</h:panelGroup>
+</composite:implementation>
+
+</ui:component>

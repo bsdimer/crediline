@@ -1,0 +1,1 @@
+native2ascii -encoding UTF-8  messages_bg.utf8.properties messages_bg.properties

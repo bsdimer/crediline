@@ -1,0 +1,617 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:c="http://java.sun.com/jsp/jstl/core"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<composite:interface>
+    <composite:attribute name="managedBean" required="true"/>
+    <composite:attribute name="person" required="true"/>
+    <composite:attribute name="uniqueIndex" required="true"/>
+</composite:interface>
+
+<composite:implementation>
+<p:tabView>
+<p:tab title="#{msg['common.main']}">
+
+<h:panelGroup id="personDetailView_#{cc.attrs.uniqueIndex}">
+
+<p:toolbar>
+    <p:toolbarGroup align="left" style="width: 100%">
+        <h:commandButton value="Print" type="button" icon="ui-icon-print">
+            <p:printer target="printArea_#{cc.attrs.uniqueIndex}"/>
+        </h:commandButton>
+    </p:toolbarGroup>
+</p:toolbar>
+
+<!--<p:dialog id="displayDocumentDialog_#{cc.attrs.uniqueIndex}" header="#{msg['common.documentBlank']}"
+          widgetVar="documentPrintDialog"
+          resizable="true"
+          showEffect="fade" hideEffect="explode" style="width: auto; height: auto" closeOnEscape="true">
+    <h:panelGrid id="displayDocumentPanelGrid_#{cc.attrs.uniqueIndex}" columns="2" cellpadding="4"
+                 style="margin:0 auto;">
+
+        <p:editor id="templateSourceEditor_#{cc.attrs.uniqueIndex}" widgetVar="ttsEditor" width="800"
+                  height="500"
+                  value="#{documentDetailsMB.selectedDocument.source}"/>
+
+    </h:panelGrid>
+</p:dialog>-->
+
+<p:fieldset legend="#{msg['common.main']}" style="margin-top: 10px; !important">
+    <h:panelGrid id="printArea_#{cc.attrs.uniqueIndex}" columns="2" columnClasses="label, value">
+
+        <p:outputLabel value="#{msg['common.id']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedPerson.id}"/>
+
+        <p:outputLabel value="#{msg['common.fullname']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedPerson.fullName}"/>
+
+        <p:outputLabel value="#{msg['common.egn']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedPerson.egn}"/>
+
+        <p:outputLabel value="#{msg['common.contact.lkno']}:" style="font-weight: bold"/>
+        <p:inplace editor="true">
+            <p:inputText value="#{cc.attrs.managedBean.selectedPerson.lkNo}"/>
+        </p:inplace>
+
+        <p:outputLabel value="#{msg['common.contact.issueDate']}:" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedPerson.lkIssueDate.toString('dd/MM/yyyy')}"/>
+
+        <p:outputLabel value="#{msg['common.validto']}:" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedPerson.validBefore.toString('dd/MM/yyyy')}"/>
+
+        <p:outputLabel value="#{msg['common.contact.lkIssuePlace']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedPerson.lkIssueLocation}"/>
+    </h:panelGrid>
+</p:fieldset>
+
+<p:fieldset legend="#{msg['common.contacts']}" style="margin-top: 10px; !important">
+    <h:panelGrid columns="2" columnClasses="label, value"
+                 style="width: 100%; height: 100%">
+
+        <c:forEach items="#{cc.attrs.managedBean.selectedPerson.addresses}" var="address">
+            <p:outputLabel value="#{msg['common.menu.address']}:" style="font-weight: bold"/>
+            <p:outputLabel value="#{address}"/>
+        </c:forEach>
+        <c:forEach items="#{cc.attrs.managedBean.selectedPerson.phones}" var="phone">
+            <p:outputLabel value="#{msg['common.contacts.phone']}:" style="font-weight: bold"/>
+            <p:outputLabel value="#{phone}"/>
+        </c:forEach>
+
+    </h:panelGrid>
+</p:fieldset>
+
+
+<p:fieldset legend="#{msg['common.additional']}" style="margin-top: 10px; !important">
+    <h:panelGrid columns="2" columnClasses="label, value">
+
+        <p:outputLabel rendered="#{not empty cc.attrs.managedBean.selectedPerson.maritalStatus}"
+                       value="#{msg['common.maritalStatus']}"
+                       style="font-weight: bold"/>
+        <p:outputLabel rendered="#{not empty cc.attrs.managedBean.selectedPerson.maritalStatus}"
+                       value="#{msg['owner.maritalStatus.'.concat(cc.attrs.managedBean.selectedPerson.maritalStatus.toString())]}"/>
+
+        <p:outputLabel rendered="#{not empty cc.attrs.managedBean.selectedPerson.education}"
+                       value="#{msg['common.education']}"
+                       style="font-weight: bold"/>
+        <p:outputLabel rendered="#{not empty cc.attrs.managedBean.selectedPerson.education}"
+                       value="#{msg['owner.education.'.concat(cc.attrs.managedBean.selectedPerson.education.toString())]}"/>
+
+        <p:outputLabel rendered="#{not empty cc.attrs.managedBean.selectedPerson.profession}"
+                       value="#{msg['common.profession']}"
+                       style="font-weight: bold"/>
+        <p:outputLabel rendered="#{not empty cc.attrs.managedBean.selectedPerson.profession}"
+                       value="#{cc.attrs.managedBean.selectedPerson.profession}"/>
+
+        <p:outputLabel rendered="#{not empty cc.attrs.managedBean.selectedPerson.workplace}"
+                       value="#{msg['common.workplace']}"
+                       style="font-weight: bold"/>
+        <p:outputLabel rendered="#{not empty cc.attrs.managedBean.selectedPerson.workplace}"
+                       value="#{cc.attrs.managedBean.selectedPerson.workplace}"/>
+
+        <p:outputLabel value="#{msg['common.rating']}" style="font-weight: bold"/>
+        <p:rating value="#{cc.attrs.managedBean.selectedPerson.rating}" stars="10" readonly="true"/>
+
+        <p:outputLabel/>
+        <p:dataTable id="commentsTable_#{cc.attrs.uniqueIndex}" var="comment" editable="true" editMode="cell"
+                     value="#{cc.attrs.managedBean.selectedPerson.comments}" style="width: 100%">
+            <f:facet name="header">
+                #{msg['common.comments']}
+            </f:facet>
+            <p:column headerText="#{msg['common.commentedFrom']}">
+                #{comment.createdBy.username}
+            </p:column>
+            <p:column headerText="#{msg['common.commentedAt']}">
+                #{comment.creationDate.toString('dd/MM/yyyy HH:mm:ss')}
+            </p:column>
+            <p:column headerText="#{msg['common.comment']}">
+                <p:cellEditor>
+                    <f:facet name="output"><h:outputText value="#{comment.value}"/></f:facet>
+                    <f:facet name="input">
+                        <p:inputText value="#{comment.value}">
+                            <p:ajax update="commentsTable_#{cc.attrs.uniqueIndex}"/>
+                        </p:inputText>
+                    </f:facet>
+                </p:cellEditor>
+
+            </p:column>
+        </p:dataTable>
+    </h:panelGrid>
+</p:fieldset>
+
+<p:fieldset legend="#{msg['common.creditHistory']}" style="margin-top: 10px; !important">
+
+<p:dataTable id="creditsTable_#{cc.attrs.uniqueIndex}" var="credit"
+             value="#{cc.attrs.managedBean.selectedPerson.credits}"
+             rowKey="#{credit.id}"
+             style="width: 100%; height: 100%; margin-bottom: 20px "
+             selection="#{cc.attrs.managedBean.selectedCredit}" selectionMode="single">
+
+    <p:ajax event="rowSelect"
+            update="@parent:creditDetailsPG_#{cc.attrs.uniqueIndex},
+                 @parent:paymentsSummaryTable_#{cc.attrs.uniqueIndex},
+                 @parent:notRequiredCreditData_#{cc.attrs.uniqueIndex}"/>
+
+    <f:facet name="header">
+        #{msg['common.menu.credits']}
+    </f:facet>
+
+    <p:column>
+        #{credit.id}
+    </p:column>
+
+    <p:column headerText="#{msg['common.credit.issuedAt']}">
+        #{credit.creationDate.toString('dd/MM/yyyy HH:mm:ss')}
+    </p:column>
+
+    <p:column headerText="#{msg['common.credit.issuedIn']}">
+        #{credit.issuedIn.name}
+    </p:column>
+
+    <p:column headerText="#{msg['common.credit.utilizedАmount']}">
+        #{credit.basis}
+    </p:column>
+
+    <p:column headerText="#{msg['common.interest']}">
+        <p:outputLabel value="#{credit.interest}">
+            <f:convertNumber type="percent" pattern="0.00%"/>
+        </p:outputLabel>
+    </p:column>
+
+    <p:column headerText="#{msg['common.credit-period']}">
+        #{credit.period}
+    </p:column>
+
+    <p:column headerText="#{msg['common.payment.returnedSum']}">
+        #{credit.returnedSum}
+    </p:column>
+
+    <p:column headerText="#{msg['common.outstanding-payment-sum']}">
+        #{credit.outstandingSumToPayWithInsurance}
+    </p:column>
+
+    <p:column headerText="#{msg['common.payment.itWasInOverdue']}">
+        #{credit.itWasInOverdue}
+    </p:column>
+
+    <p:column headerText="#{msg['common.status']}">
+        #{msg['common.realCreditState.'.concat(credit.creditState)]}
+    </p:column>
+
+</p:dataTable>
+
+<p:dataTable id="creditsInGuarantorTable_#{cc.attrs.uniqueIndex}" var="credit"
+             value="#{cc.attrs.managedBean.personAdvancedInfo.creditsInGuarantor}"
+             rowKey="#{credit.id}"
+             style="width: 100%; height: 100%; margin-bottom: 20px"
+             selection="#{cc.attrs.managedBean.selectedCredit}" selectionMode="single">
+
+    <p:ajax event="rowSelect"
+            update="@parent:creditDetailsPG_#{cc.attrs.uniqueIndex},
+                 @parent:paymentsSummaryTable_#{cc.attrs.uniqueIndex},
+                 @parent:notRequiredCreditData_#{cc.attrs.uniqueIndex}"/>
+
+    <f:facet name="header">
+        #{msg['common.menu.creditsInGuarantor']}
+    </f:facet>
+
+    <p:column width="30px">
+        #{credit.id}
+    </p:column>
+
+    <p:column headerText="#{msg['common.credit.issuedAt']}">
+        #{credit.creationDate.toString('dd/MM/yyyy HH:mm:ss')}
+    </p:column>
+
+    <p:column headerText="#{msg['common.credit.issuedIn']}">
+        #{credit.issuedIn.name}
+    </p:column>
+
+    <p:column headerText="#{msg['common.credit.utilizedАmount']}">
+        #{credit.basis}
+    </p:column>
+
+    <p:column headerText="#{msg['common.interest']}">
+        <p:outputLabel value="#{cc.attrs.credit.interest}">
+            <f:convertNumber type="percent" pattern="0.00%"/>
+        </p:outputLabel>
+    </p:column>
+
+    <p:column headerText="#{msg['common.credit-period']}">
+        #{credit.period}
+    </p:column>
+
+    <p:column headerText="#{msg['common.payment.returnedSum']}">
+        #{credit.returnedSum}
+    </p:column>
+
+    <p:column headerText="#{msg['common.outstanding-payment-sum']}">
+        #{credit.outstandingSumToPayWithInsurance}
+    </p:column>
+
+    <p:column headerText="#{msg['common.payment.itWasInOverdue']}">
+        #{credit.itWasInOverdue}
+    </p:column>
+
+    <p:column headerText="#{msg['common.status']}">
+        #{msg['common.realCreditState.'.concat(credit.creditState)]}
+    </p:column>
+
+</p:dataTable>
+
+<p:dataTable id="paymentsSummaryTable_#{cc.attrs.uniqueIndex}" var="payment"
+             value="#{cc.attrs.managedBean.selectedCredit.payments}"
+             widgetVar="paymentsSummaryTable_#{cc.attrs.uniqueIndex}">
+
+    <f:facet name="header">
+        #{msg['common.payments']}
+    </f:facet>
+
+    <p:column headerText="id" width="30px">
+        <h:outputText value="#{payment.id}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.basis']}">
+        <h:outputText value="#{payment.basis}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.interest']}">
+        <h:outputText value="#{payment.interest}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.insurance']}">
+        <h:outputText value="#{payment.insurance}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.sum']}">
+        <h:outputText value="#{payment.sum}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.payment.close-date']}">
+        <h:outputText value="#{payment.closedDate.toString('dd/MM/yyyy')}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.payment.due-date']}">
+        <h:outputText value="#{payment.dueDate.toString('dd/MM/yyyy')}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.payment.itWasInOverdue']}">
+        <h:outputText value="#{payment.itWasInOverdue}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['common.payment.isBilled']}">
+        <h:outputText value="#{payment.isBilled}"/>
+    </p:column>
+
+    <!--<p:columnGroup type="footer">
+        <p:row>
+            <p:column colspan="3" footerText="Totals:"
+                      style="text-align:right"/>
+
+            <p:column footerText="#{cc.attrs.credit.fullSum}"/>
+        </p:row>
+    </p:columnGroup>-->
+</p:dataTable>
+
+<p:fieldset legend="#{msg['common.details']}" style="margin-top: 10px; !important">
+
+    <h:panelGrid id="creditDetailsPG_#{cc.attrs.uniqueIndex}" columns="4" columnClasses="label, value">
+
+        <p:outputLabel value="#{msg['common.id']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.id}"/>
+
+        <p:outputLabel value="#{msg['common.credit-sum']}" style="font-weight: bold"/>
+        <p:outputLabel
+                value="#{cc.attrs.managedBean.selectedCredit.basis} #{cc.attrs.managedBean.selectedCredit.currency}"/>
+
+        <p:outputLabel value="#{msg['common.credit-time']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.period} #{msg['common.months']}"/>
+
+        <p:outputLabel value="#{msg['common.credit-month-interest']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.interest}">
+            <f:convertNumber type="percent" pattern="0.00%"/>
+        </p:outputLabel>
+
+        <p:outputLabel value="#{msg['common.issuedFrom']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.issuer.username}"/>
+
+        <p:outputLabel value="#{msg['common.credit.issuedAt']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.pickUpDate.toString('dd/MM/yyyy HH:mm:ss')}"/>
+
+        <p:outputLabel value="#{msg['common.credit.issuedIn']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.issuedIn.name}"/>
+
+        <p:outputLabel value="#{msg['common.payment.due-date']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.dueDate.toString('dd/MM/yyyy')}"/>
+
+        <p:outputLabel value="#{msg['common.payment.itWasInOverdue']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.itWasInOverdue}"/>
+
+        <p:outputLabel value="#{msg['common.credit-insurance-value']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.insurance.sum}"/>
+
+        <p:outputLabel value="#{msg['common.credit.utilizedАmount']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.basis}"/>
+
+        <p:outputLabel value="#{msg['common.credit.returnAmount']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.paymentsSumWithInsurance}"/>
+
+        <p:outputLabel value="#{msg['common.payment.interestSum']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.interestSum}"/>
+
+        <p:outputLabel value="#{msg['common.payment.basisSum']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.basisSum}"/>
+
+        <p:outputLabel value="#{msg['common.payment.returnedSum']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.returnedSum}"/>
+
+        <!--<p:outputLabel value="#{msg['common.payment.returnedInterest']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.returnedInterest}"/>
+
+        <p:outputLabel value="#{msg['common.payment.returnedBasis']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.returnedBasis}"/>-->
+
+        <p:outputLabel value="#{msg['common.payment.oustandingSum']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.selectedCredit.outstandingSumToPayWithInsurance}"/>
+
+    </h:panelGrid>
+</p:fieldset>
+
+<h:panelGroup layout="block" id="notRequiredCreditData_#{cc.attrs.uniqueIndex}">
+    <p:fieldset legend="#{msg['common.menu.guarantors']}" style="margin-top: 10px; !important">
+        <c:if test="${cc.attrs.managedBean.selectedCredit.guarantor1.id > 0}">
+            <h:panelGrid columns="2" columnClasses="label, value"
+                         styleClass="grid">
+                <p:outputLabel value="#{msg['common.credit-guarantor']}:" style="font-weight: bold"/>
+                <p:outputLabel
+                        value="#{cc.attrs.managedBean.selectedCredit.guarantor1.fullName}"/>
+                <p:outputLabel value="#{msg['common.egn']}:" style="font-weight: bold"/>
+                <p:outputLabel
+                        value="#{cc.attrs.managedBean.selectedCredit.guarantor1.egn}"/>
+                <p:outputLabel value="#{msg['common.contact.lkno']}:" style="font-weight: bold"/>
+                <p:outputLabel
+                        value="#{cc.attrs.managedBean.selectedCredit.guarantor1.lkNo}"/>
+                <h:outputText value="#{msg['common.status']}" style="font-weight: bold"/>
+                <p:rating value="#{cc.attrs.managedBean.selectedCredit.guarantor1.rating}" stars="10" readonly="true"/>
+                <c:forEach items="#{cc.attrs.managedBean.selectedCredit.guarantor1.addresses}" var="address">
+                    <p:outputLabel value="#{msg['common.menu.address']}:" style="font-weight: bold"/>
+                    <p:outputLabel value="#{address}"/>
+                </c:forEach>
+                <c:forEach items="#{cc.attrs.managedBean.selectedCredit.guarantor1.phones}" var="phone">
+                    <p:outputLabel value="#{msg['common.contacts.phone']}:" style="font-weight: bold"/>
+                    <p:outputLabel value="#{phone}"/>
+                </c:forEach>
+            </h:panelGrid>
+        </c:if>
+
+        <c:if test="${cc.attrs.managedBean.selectedCredit.guarantor2.id > 0}">
+            <h:panelGrid columns="2" columnClasses="label, value"
+                         styleClass="grid">
+                <p:outputLabel value="#{msg['common.credit-guarantor']}:" style="font-weight: bold"/>
+                <p:outputLabel
+                        value="#{cc.attrs.managedBean.selectedCredit.guarantor2.fullName}"/>
+                <p:outputLabel value="#{msg['common.egn']}:" style="font-weight: bold"/>
+                <p:outputLabel
+                        value="#{cc.attrs.managedBean.selectedCredit.guarantor2.egn}"/>
+                <p:outputLabel value="#{msg['common.contact.lkno']}:" style="font-weight: bold"/>
+                <p:outputLabel
+                        value="#{cc.attrs.managedBean.selectedCredit.guarantor2.lkNo}"/>
+                <h:outputText value="#{msg['common.status']}" style="font-weight: bold"/>
+                <p:rating value="#{cc.attrs.managedBean.selectedCredit.guarantor2.rating}" stars="10" readonly="true"/>
+                <c:forEach items="#{cc.attrs.managedBean.selectedCredit.guarantor2.addresses}" var="address">
+                    <p:outputLabel value="#{msg['common.menu.address']}:" style="font-weight: bold"/>
+                    <p:outputLabel value="#{address}"/>
+                </c:forEach>
+                <c:forEach items="#{cc.attrs.managedBean.selectedCredit.guarantor2.phones}" var="phone">
+                    <p:outputLabel value="#{msg['common.contacts.phone']}:" style="font-weight: bold"/>
+                    <p:outputLabel value="#{phone}"/>
+                </c:forEach>
+            </h:panelGrid>
+        </c:if>
+    </p:fieldset>
+
+    <p:fieldset legend="#{msg['common.documents']}" style="margin-top: 10px; !important">
+        <h:panelGrid columns="2" columnClasses="label, value"
+                     styleClass="grid">
+            <c:forEach items="#{cc.attrs.credit.documents}" var="document">
+                <p:outputLabel value="#{msg['common.id']}:" style="font-weight: bold"/>
+                <p:outputLabel value="#{document.id}"/>
+                <p:outputLabel value="#{msg['common.name']}:" style="font-weight: bold"/>
+                <p:outputLabel value="#{document.name}"/>
+                <p:outputLabel/>
+                <p:commandButton icon="ui-icon-print"
+                                 actionListener="#{documentDetailsMB.printDocument(document)}"
+                                 oncomplete="PF('documentPrintDialog').show()"
+                                 value="#{msg['common.print']}" ajax="true" process="@this"
+                                 update="displayDocumentPanelGrid_#{cc.attrs.uniqueIndex}">
+                </p:commandButton>
+                <p:outputLabel value="#{msg['common.location']}:" style="font-weight: bold"/>
+                <p:outputLabel value="#{document.location.name}"/>
+            </c:forEach>
+        </h:panelGrid>
+    </p:fieldset>
+</h:panelGroup>
+</p:fieldset>
+
+
+</h:panelGroup>
+</p:tab>
+
+<p:tab title="#{msg['common.additional']}">
+    <!--<h:panelGroup id="personAdditionalView_#{cc.attrs.uniqueIndex}">
+        <p:toolbar>
+            <p:toolbarGroup align="left" style="width: 100%">
+
+                <p:outputLabel for="startDate_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.to']}: "/>
+                <p:calendar id="startDate_#{cc.attrs.uniqueIndex}"
+                            value="#{cc.attrs.managedBean.personAdvancedInfo.startDate}"
+                            pattern="dd/MM/yyyy" converter="dateConverter"
+                            showButtonPanel="true" navigator="true"
+                            mode="popup" showOn="button" popupIconOnly="true" tabindex="3"/>
+
+                <p:outputLabel for="endDate_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.from']}: "/>
+                <p:calendar id="endDate_#{cc.attrs.uniqueIndex}"
+                            value="#{cc.attrs.managedBean.personAdvancedInfo.endDate}"
+                            pattern="dd/MM/yyyy" converter="dateConverter"
+                            showButtonPanel="true" navigator="true"
+                            mode="popup" showOn="button" popupIconOnly="true" tabindex="2"/>
+
+                <p:commandButton icon="ui-icon-search"
+                                 actionListener="#{cc.attrs.managedBean.personAdvancedInfo.searchOnStreet(cc.attrs.managedBean.selectedPerson)}"
+                                 value="#{msg['common.onStreet']}" style="margin-top: 10px"
+                                 update="resultPersonDetailsDiv_#{cc.attrs.uniqueIndex}"/>
+
+                <p:commandButton icon="ui-icon-search"
+                                 actionListener="#{cc.attrs.managedBean.personAdvancedInfo.searchOnAddress(cc.attrs.managedBean.selectedPerson)}"
+                                 value="#{msg['common.onAddress']}" style="margin-top: 10px"
+                                 update="resultPersonDetailsDiv_#{cc.attrs.uniqueIndex}"/>
+
+                <p:commandButton icon="ui-icon-search"
+                                 actionListener="#{cc.attrs.managedBean.personAdvancedInfo.searchOnCity(cc.attrs.managedBean.selectedPerson)}"
+                                 value="#{msg['common.onCity']}" style="margin-top: 10px"
+                                 update="resultPersonDetailsDiv_#{cc.attrs.uniqueIndex}"/>
+
+                <p:commandButton icon="ui-icon-search"
+                                 actionListener="#{cc.attrs.managedBean.personAdvancedInfo.searchOnNumber(cc.attrs.managedBean.selectedPerson)}"
+                                 value="#{msg['common.onNumber']}" style="margin-top: 10px"
+                                 update="resultPersonDetailsDiv_#{cc.attrs.uniqueIndex}"/>
+
+            </p:toolbarGroup>
+        </p:toolbar>
+
+
+    </h:panelGroup>
+    <h:panelGroup id="resultPersonDetailsDiv_#{cc.attrs.uniqueIndex}">
+        <p:editor id="resultPersonDetails_#{uniqueIndex}" widgetVar="resultPersonDetails"
+                  style="width: 100%; height: 100%; margin-top: 20px"
+                  value="#{cc.attrs.managedBean.personAdvancedInfo.additionalSearchResult}"/>
+    </h:panelGroup>-->
+
+    <h:panelGroup layout="block">
+
+        <p:toolbar>
+            <f:facet name="left">
+                <p:outputLabel for="startDate_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.startDate']}:" style="margin-left: 10px; margin-right: 10px"/>
+                <p:calendar id="startDate_#{cc.attrs.uniqueIndex}"
+                            value="#{inquiryFuturePayments.startDate}"
+                            pattern="dd/MM/yyyy" converter="dateConverter"
+                            showButtonPanel="true" navigator="true"
+                            mode="popup" showOn="button" popupIconOnly="true"/>
+
+                <p:outputLabel for="endDate_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.endDate']}:" style="margin-left: 10px; margin-right: 10px"/>
+                <p:calendar id="endDate_#{cc.attrs.uniqueIndex}"
+                            value="#{inquiryFuturePayments.endDate}"
+                            pattern="dd/MM/yyyy" converter="dateConverter"
+                            showButtonPanel="true" navigator="true"
+                            mode="popup" showOn="button" popupIconOnly="true"/>
+                <p:commandButton icon="ui-icon-search"
+                                 actionListener="#{inquiryFuturePayments.searchOnStreet(cc.attrs.managedBean.selectedPerson)}"
+                                 value="#{msg['common.onStreet']}"
+                                 update="resultDiv_#{cc.attrs.uniqueIndex}, summaryPG_#{cc.attrs.uniqueIndex}"/>
+
+                <p:commandButton icon="ui-icon-search"
+                                 actionListener="#{inquiryFuturePayments.searchOnStreetNo(cc.attrs.managedBean.selectedPerson)}"
+                                 value="#{msg['common.onNumber']}"
+                                 update="resultDiv_#{cc.attrs.uniqueIndex}, summaryPG_#{cc.attrs.uniqueIndex}"/>
+
+                <p:commandButton icon="ui-icon-search"
+                                 actionListener="#{inquiryFuturePayments.searchOnCity(cc.attrs.managedBean.selectedPerson)}"
+                                 value="#{msg['common.onCity']}" disabled="true"
+                                 update="resultDiv_#{cc.attrs.uniqueIndex}, summaryPG_#{cc.attrs.uniqueIndex}"/>
+
+            </f:facet>
+        </p:toolbar>
+
+
+        <h:panelGroup layout="block" id="mainContainer_#{cc.attrs.uniqueIndex}"
+                      style="height: 100%">
+
+
+            <h:panelGroup id="resultDiv_#{cc.attrs.uniqueIndex}" layout="block"
+                          style="height: 100%">
+                <h:outputText style="margin: 20px 10px 15px;"
+                              value="#{msg['common.countResults']}: #{inquiryFuturePayments.result.size()}"/>
+                <p:dataTable var="person" value="#{inquiryFuturePayments.result}" scrollRows="5" scrollHeight="330"
+                             scrollable="true" liveScroll="true" lazy="true" id="tableResult_#{cc.attrs.uniqueIndex}"
+                             widgetVar="resultTable_#{cc.attrs.uniqueIndex}">
+
+                    <p:column headerText="id" style="width:35px" sortBy="#{person.id}">
+                        <h:outputText value="#{person.id}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg['common.fullname']}" sortBy="#{person.fullName}" style="width:170px">
+                        <h:outputText value="#{person.fullName}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg['common.egn']}" sortBy="#{person.egn}" style="width:80px">
+                        <h:outputText value="#{person.egn}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg['common.menu.address']}">
+                        <h:outputText value="#{person.addresses[0]}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg['common.dueSumForPeriod']}" style="width:80px">
+                        <h:outputText value="#{inquiryFuturePayments.dueSumForPeriod(person)}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg['common.dueSum']}" style="width:80px">
+                        <h:outputText value="#{person.dueSum}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg['common.rating']}" style="width:180px" sortBy="#{person.rating}">
+                        <p:rating stars="10" value="#{person.rating}" readonly="true"/>
+                    </p:column>
+
+                </p:dataTable>
+                <p:fieldset legend="#{msg['common.summary']}"
+                            style="margin-top: 10px; margin-right: 10px">
+                    <h:panelGrid id="summaryPG_#{cc.attrs.uniqueIndex}" columns="2" styleClass="grid">
+
+                        <p:outputLabel style="font-weight: bold" value="#{msg['common.dueSumForPeriod']}"/>
+                        <p:outputLabel value="#{inquiryFuturePayments.sumForThePeriod}"/>
+
+                        <p:outputLabel style="font-weight: bold" value="#{msg['common.dueSum']}"/>
+                        <p:outputLabel value="#{inquiryFuturePayments.fullSumForThePeriod}"/>
+
+                        <p:outputLabel style="font-weight: bold" value="#{msg['common.dueSumUntilNow']}"/>
+                        <p:outputLabel value="#{inquiryFuturePayments.dueSumUntilNow}"/>
+
+                    </h:panelGrid>
+                </p:fieldset>
+            </h:panelGroup>
+        </h:panelGroup>
+    </h:panelGroup>
+
+</p:tab>
+
+</p:tabView>
+</composite:implementation>
+
+</ui:component>

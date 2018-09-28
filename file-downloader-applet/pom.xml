@@ -1,0 +1,166 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.crediline</groupId>
+		<artifactId>crediline</artifactId>
+		<version>0.1</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<groupId>com.crediline.printer</groupId>
+	<artifactId>file-downloader-applet</artifactId>
+	<version>1.0-RELEASE</version>
+	<name>File Downloader Applet</name>
+
+	<properties>
+		<artifactName>${project.artifactId}-${project.version}</artifactName>
+		<maven-jarsigner-plugin.version>1.2</maven-jarsigner-plugin.version>
+		<outputDir>${project.build.directory}/${artifactName}/</outputDir>
+		<keyStorePath>keystore.jks</keyStorePath>
+		<alias>signer</alias>
+		<password>!secret</password>
+
+		<permissions>all-permissions</permissions>
+		<codebase>192.168.1.116 127.0.0.1 localhost 78.159.157.87 zig.zag.bg file://* crediline.bg crediline.com</codebase>
+		<caller-allowable-codebase>192.168.1.116 127.0.0.1 localhost 78.159.157.87 zig.zag.bg file://* crediline.bg crediline.com</caller-allowable-codebase>
+		<application-library-allowable-codebase>192.168.1.116 127.0.0.1 localhost 78.159.157.87 zig.zag.bg file://* crediline.bg crediline.com</application-library-allowable-codebase>
+		<trusted-only>true</trusted-only>
+		
+		<applet.resources.copy.dir>${project.build.directory}/../../crediline-core/src/main/webapp/resources</applet.resources.copy.dir>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.3.2</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor>assembly.xml</descriptor>
+						<descriptor>allAssembly.xml</descriptor>
+					</descriptors>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+						<manifestEntries>
+							<!-- security parameters -->
+							<Application-Name>File Downloader Applet</Application-Name>
+							<Permissions>${permissions}</Permissions>
+							<Codebase>${codebase}</Codebase>
+							<Caller-Allowable-Codebase>${caller-allowable-codebase}</Caller-Allowable-Codebase>
+							<Application-Library-Allowable-Codebase>${application-library-allowable-codebase}</Application-Library-Allowable-Codebase>
+							<Trusted-Only>${trusted-only}</Trusted-Only>
+						</manifestEntries>
+					</archive>
+					<finalName>${artifactName}</finalName>
+					<appendAssemblyId>false</appendAssemblyId>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jarsigner-plugin</artifactId>
+				<version>${maven-jarsigner-plugin.version}</version>
+				<configuration>
+					<keystore>${keyStorePath}</keystore>
+					<alias>${alias}</alias>
+					<storepass>${password}</storepass>
+					<archiveDirectory>${outputDir}</archiveDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<id>sign</id>
+						<phase>package</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>verify</id>
+						<goals>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-applet-js</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${applet.resources.copy.dir}/js</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/resources</directory>
+									<includes>
+										<include>*.js</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-applet-jnlp</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${applet.resources.copy.dir}/file-downloader-applet</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/resources</directory>
+									<includes>
+										<include>*.jnlp</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-applet-signed-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${applet.resources.copy.dir}/file-downloader-applet</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.build.directory}/${artifactName}/${artifactName}</directory>
+									<includes>
+										<include>*.jar</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

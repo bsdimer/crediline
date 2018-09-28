@@ -1,0 +1,106 @@
+<ui:component xmlns=""
+              xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:c="http://java.sun.com/jsp/jstl/core"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <composite:interface>
+        <composite:attribute name="managedBean" required="true"/>
+        <composite:attribute name="uniqueIndex" required="true"/>
+    </composite:interface>
+
+    <composite:implementation>
+        <h:form id="mainContactsForm_#{cc.attrs.uniqueIndex}" style="width: 100% !important;">
+
+            <p:messages id="messages_#{cc.attrs.uniqueIndex}" showDetail="true"/>
+            <p:focus for="name_#{cc.attrs.uniqueIndex}"/>
+
+            <p:toolbar>
+                <f:facet name="left">
+                    <p:commandButton title="#{msg['common.menu.save']}" value="#{msg['common.menu.save']}"
+                                     icon="ui-icon-disk"
+                                     actionListener="#{cc.attrs.managedBean.save}" update="@form">
+                        <p:confirm header="#{msg['common.confirmation']}" message="#{msg['common.areyousure_Save']}"
+                                   icon="ui-icon-alert"/>
+                    </p:commandButton>
+                </f:facet>
+            </p:toolbar>
+
+            <p:fieldset legend="#{msg['common.main']}" style="margin-top: 10px; !important;">
+
+                <h:panelGrid id="mainGrid_#{cc.attrs.uniqueIndex}" columns="2"
+                             columnClasses="label, value, message">
+
+                    <h:outputLabel for="name_#{cc.attrs.uniqueIndex}" value="#{msg['common.name']}"/>
+                    <p:inputText id="name_#{cc.attrs.uniqueIndex}" required="true" tabindex="1"
+                                 label="#{msg['common.name']}"
+                                 value="#{cc.attrs.managedBean.region.name}">
+                        <p:ajax update="@none" event="keyup"/>
+                    </p:inputText>
+
+                    <p:outputLabel for="regionalManager_#{cc.attrs.uniqueIndex}"
+                                   value="#{msg['common.manager']}"/>
+                    <p:autoComplete id="regionalManager_#{cc.attrs.uniqueIndex}" required="true"
+                                    label="#{msg['common.manager']}" panelStyle="width:600px"
+                                    queryDelay="500" cache="true" cacheTimeout="5000" tabindex="2"
+                                    value="#{cc.attrs.managedBean.region.manager}" converter="#{personConverter}"
+                                    completeMethod="#{autoComplete.autoCompletePerson}" maxResults="10" var="p"
+                                    itemValue="#{p}" itemLabel="#{p.fullName}" dropdown="true">
+
+                        <p:column headerText="#{msg['common.name']}">
+                            #{p.name} #{p.midname} #{p.surname}
+                        </p:column>
+
+                        <p:column>
+                            #{p.egn}
+                        </p:column>
+
+                        <p:column>
+                            #{p.addresses[0].city}
+                        </p:column>
+
+                        <p:column>
+                            #{p.addresses[0].street}
+                        </p:column>
+
+                        <p:column>
+                            #{p.addresses[0].number}
+                        </p:column>
+
+                        <p:column>
+                            #{p.addresses[0].entrance}
+                        </p:column>
+
+                        <p:column>
+                            #{p.addresses[0].floor}
+                        </p:column>
+
+                        <p:column>
+                            #{p.addresses[0].apartment}
+                        </p:column>
+                    </p:autoComplete>
+
+                </h:panelGrid>
+
+            </p:fieldset>
+
+            <p:toolbar>
+                <f:facet name="left">
+                    <p:commandButton id="defaultCommandButton_#{cc.attrs.uniqueIndex}"
+                                     title="#{msg['common.menu.save']}" value="#{msg['common.menu.save']}"
+                                     icon="ui-icon-disk"
+                                     actionListener="#{cc.attrs.managedBean.save}" update="@form">
+                        <p:confirm header="#{msg['common.confirmation']}" message="#{msg['common.areyousure_Save']}"
+                                   icon="ui-icon-alert"/>
+                    </p:commandButton>
+                </f:facet>
+            </p:toolbar>
+
+            <p:defaultCommand target="defaultCommandButton_#{cc.attrs.uniqueIndex}"/>
+
+        </h:form>
+    </composite:implementation>
+
+</ui:component>

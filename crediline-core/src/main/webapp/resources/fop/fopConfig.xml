@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fop version="1.0">
+    <renderers>
+        <renderer mime="application/pdf">
+            <fonts>
+                <!--<directory recursive="true">./fonts/</directory>-->
+                <!--<auto-detect/>-->
+                <font kerning="yes" embed-url="Times_New_Roman.ttf"
+                      embedding-mode="subset">
+                    <font-triplet name="Times" style="normal" weight="normal"/>
+                </font>
+                <font kerning="yes" embed-url="Times_New_Roman_Bold.ttf"
+                      embedding-mode="subset">
+                    <font-triplet name="Times" style="normal" weight="bold"/>
+                </font>
+                <!--<referenced-fonts>
+                    <match font-family=".*"/>
+                </referenced-fonts>-->
+            </fonts>
+        </renderer>
+    </renderers>
+</fop>

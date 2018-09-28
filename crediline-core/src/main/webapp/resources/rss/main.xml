@@ -1,0 +1,34 @@
+<rss version="2.0">
+    <channel>
+        <title>Crediline новини</title>
+        <link>http://localhost/rss/main.xml</link>
+        <description>Новини за кредилайн</description>
+        <language>en-US</language>
+        <copyright>Copyright (c) 2014 Crediline ! Inc. All rights reserved</copyright>
+        <pubDate>Wed, 10 Sep 2014 03:10:28 -0400</pubDate>
+        <ttl>1</ttl>
+        <item>
+            <title>Your Top Plays for Today</title>
+            <description>
+                <p>
+                    <a href="http://news.yahoo.com/top-plays-today-071028738--spt.html">
+                        <img src="http://l.yimg.com/bt/api/res/1.2/vLElWe2EORqA4nSEKkWPIQ--/YXBwaWQ9eW5ld3M7Zmk9ZmlsbDtoPTg2O3B4b2ZmPTUwO3B5b2ZmPTA7cT03NTt3PTEzMA--/http://media.zenfs.com/en_us/News/ap_webfeeds/9bb0c242a0a341235f0f6a706700e41a.jpg"
+                             width="130" height="86"
+                             alt="Detroit Tigers starting pitcher Max Scherzer reacts after striking out Kansas City Royals&#039; Eric Hosmer to end the top of the fifth inning of a baseball game in Detroit, Tuesday, Sept. 9, 2014. (AP Photo/Carlos Osorio)"
+                             align="left"
+                             title="Detroit Tigers starting pitcher Max Scherzer reacts after striking out Kansas City Royals&#039; Eric Hosmer to end the top of the fifth inning of a baseball game in Detroit, Tuesday, Sept. 9, 2014. (AP Photo/Carlos Osorio)"
+                             border="0"/>
+                    </a>
+                    Your Top Plays for Today: AP&#039;s Sports Guide
+                </p>
+                <br clear="all"/>
+            </description>
+            <link>
+                http://news.yahoo.com/top-plays-today-071028738--spt.html
+            </link>
+            <pubDate>Wed, 10 Sep 2014 03:10:28 -0400</pubDate>
+            <source url="http://www.ap.org/">Associated Press</source>
+            <guid isPermaLink="false">top-plays-today-071028738--spt</guid>
+        </item>
+    </channel>
+</rss>

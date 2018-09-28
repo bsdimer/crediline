@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.crediline</groupId>
+    <artifactId>crediline</artifactId>
+    <version>0.1</version>
+    <packaging>pom</packaging>
+    <name>Crediline Assembly</name>
+
+    <modules>
+        <module>file-downloader-applet</module>
+        <module>crediline-core</module>
+        <module>qz-applet</module>
+        <!--<module>csv-importer</module>-->
+    </modules>
+
+    <repositories>
+
+        <repository>
+            <id>central</id>
+            <name>Central Repository</name>
+            <url>http://repo.maven.apache.org/maven2</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>prime-repo</id>
+            <name>PrimeFaces Maven Repository</name>
+            <url>http://repository.primefaces.org</url>
+            <layout>default</layout>
+        </repository>
+
+    </repositories>
+</project>

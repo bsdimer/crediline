@@ -1,0 +1,178 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <composite:interface>
+        <composite:attribute name="managedBean" required="true" type="com.crediline.mb.InquiryInsurancesMB"/>
+        <composite:attribute name="uniqueIndex" required="true"/>
+    </composite:interface>
+
+    <composite:implementation>
+        <h:panelGroup layout="block" style="float: left; padding: 10px; width: 100%">
+
+            <!--<p:ajaxStatus onstart="PF('statusDialog').show();" onsuccess="PF('statusDialog').hide();"/>
+
+            <p:dialog modal="true" widgetVar="statusDialog" header="Status"
+                      draggable="false" closable="false">
+                <p:graphicImage value="/design/ajaxloadingbar.gif" />
+            </p:dialog>-->
+
+            <h:form id="mainContactsForm_#{cc.attrs.uniqueIndex}" style="width: 100%">
+
+                <p:growl id="growl_#{cc.attrs.uniqueIndex}" showDetail="true" sticky="true"/>
+                <p:messages id="messages_#{cc.attrs.uniqueIndex}" showDetail="true"/>
+
+                <p:toolbar>
+                    <p:toolbarGroup align="left" style="width: 100%">
+                        <p:commandButton title="#{msg['common.menu.search']}" icon="ui-icon-search"
+                                         actionListener="#{cc.attrs.managedBean.search}"
+                                         update="@form:resultDiv_#{cc.attrs.uniqueIndex}"/>
+                        <p:commandButton title="#{msg['common.transferNow']}" icon="ui-icon-circle-arrow-e"
+                                         actionListener="#{cc.attrs.managedBean.transfer}"
+                                         update="@form:resultDiv_#{cc.attrs.uniqueIndex}"/>
+                        <p:commandButton title="#{msg['common.print']}" icon="ui-icon-print"
+                                         actionListener="#{cc.attrs.managedBean.printOverduCreditsDocument}"/>
+                        <p:commandButton title="#{msg['common.print']}" icon="ui-icon-circle-arrow-s"
+                                         ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+                            <p:fileDownload value="#{cc.attrs.managedBean.file}"/>
+                        </p:commandButton>
+                    </p:toolbarGroup>
+                </p:toolbar>
+
+
+                <h:panelGroup layout="block" style="height: 100%">
+                    <h:panelGroup layout="block" style="float: left; width: 25%; height: 100%">
+                        <h:panelGroup layout="block" style="clear: both; height: 100%">
+
+                            <p:fieldset legend="#{msg['common.personData']}"
+                                        style="margin-top: 10px; margin-right: 10px">
+                                <h:panelGrid columns="2" styleClass="grid">
+
+                                    <p:outputLabel for="issuedAfter_#{cc.attrs.uniqueIndex}"
+                                                   value="#{msg['common.credit.issuedAfter']}"/>
+                                    <p:calendar id="issuedAfter_#{cc.attrs.uniqueIndex}"
+                                                value="#{cc.attrs.managedBean.issuedAfter}"
+                                                pattern="dd/MM/yyyy" converter="dateConverter"
+                                                showButtonPanel="true" navigator="true"
+                                                mode="popup" showOn="button" popupIconOnly="true"/>
+
+                                    <p:outputLabel for="issuedBefore_#{cc.attrs.uniqueIndex}"
+                                                   value="#{msg['common.credit.issuedBefore']}"/>
+                                    <p:calendar id="issuedBefore_#{cc.attrs.uniqueIndex}"
+                                                value="#{cc.attrs.managedBean.issuedBefore}"
+                                                pattern="dd/MM/yyyy" converter="dateConverter"
+                                                showButtonPanel="true" navigator="true"
+                                                mode="popup" showOn="button" popupIconOnly="true"/>
+
+                                </h:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset legend="#{msg['common.additional']}"
+                                        style="margin-top: 10px; margin-right: 10px">
+                                <h:panelGrid columns="2" styleClass="grid">
+                                    <p:outputLabel for="insuranceStateSelector_#{cc.attrs.uniqueIndex}"
+                                                   value="#{msg['common.status']}"/>
+                                    <h:selectOneMenu id="insuranceStateSelector_#{cc.attrs.uniqueIndex}"
+                                                     value="#{cc.attrs.managedBean.insuranceState}">
+                                        <f:selectItem itemLabel="#{msg['common.all']}" noSelectionOption="true"
+                                                      itemValue="#{null}"/>
+                                        <f:selectItems
+                                                value="#{data.insuranceStates}"
+                                                var="insuranceState"
+                                                itemValue="#{insuranceState}"
+                                                itemLabel="#{msg['common.insurance.status.'.concat(insuranceState)]}"/>
+                                    </h:selectOneMenu>
+                                </h:panelGrid>
+                            </p:fieldset>
+
+                            <p:commandButton title="#{msg['common.menu.search']}" icon="ui-icon-search"
+                                             actionListener="#{cc.attrs.managedBean.search}" tabindex="9"
+                                             value="#{msg['common.menu.search']}" style="margin-top: 10px"
+                                             update="@form"/>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                    <h:panelGroup layout="block" style="float: left; margin-top: 13px; width: 75%; height: 100%">
+                        <h:panelGroup id="resultDiv_#{cc.attrs.uniqueIndex}" layout="block"
+                                      style="clear: both; height: 100%">
+                            <h:outputText style="margin: 20px 10px 15px;"
+                                          value="#{msg['common.countResults']}: #{cc.attrs.managedBean.result.size()}"/>
+                            <p:dataTable var="insurance" value="#{cc.attrs.managedBean.result}" scrollRows="20"
+                                         lazy="true"
+                                         scrollable="true" liveScroll="true" scrollHeight="625"
+                                         id="tableResult_#{cc.attrs.uniqueIndex}"
+                                         widgetVar="resultTable_#{cc.attrs.uniqueIndex}"
+                                         filteredValue="#{cc.attrs.managedBean.filteredInsurances}">
+
+                                <p:column headerText="№" width="10%" sortBy="id">
+                                    <h:outputText value="#{insurance.id}"/>
+                                </p:column>
+
+                                <p:column width="10%" headerText="#{msg['common.numberOfContract']}"
+                                          sortBy="#{insurance.credit.id}">
+                                    <h:outputText value="#{insurance.credit.id}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['common.credit.issuedAt']}"
+                                          sortBy="#{insurance.creationDate}">
+                                    <h:outputText value="#{insurance.creationDate.toString('dd/MM/yyyy')}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['common.payment.close-date']}"
+                                          sortBy="#{insurance.creationDate}">
+                                    <h:outputText value="#{insurance.closedDate.toString('dd/MM/yyyy')}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['common.insurance.paidDate']}"
+                                          sortBy="#{insurance.creationDate}">
+                                    <h:outputText value="#{insurance.paidDate.toString('dd/MM/yyyy')}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['common.sum']}" width="10%" sortBy="#{insurance.sum}">
+                                    #{insurance.sum}
+                                </p:column>
+
+                                <p:column headerText="#{msg['common.status']}">
+                                    <h:outputText value="#{msg['common.insurance.status.'.concat(insurance.status)]}"/>
+                                </p:column>
+
+                            </p:dataTable>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </h:panelGroup>
+
+
+                <h:panelGroup layout="block" style="clear: both; width: 100%; margin-top: 10px">
+                    <p:toolbar>
+                        <p:toolbarGroup align="left" style="width: 100%">
+                            <p:commandButton title="#{msg['common.menu.search']}" icon="ui-icon-search"
+                                             actionListener="#{cc.attrs.managedBean.search}"
+                                             update="@form:resultDiv_#{cc.attrs.uniqueIndex}"/>
+                            <p:commandButton title="#{msg['common.print']}" icon="ui-icon-print"
+                                             actionListener="#{cc.attrs.managedBean.printOverduCreditsDocument}"/>
+                        </p:toolbarGroup>
+                    </p:toolbar>
+                </h:panelGroup>
+            </h:form>
+
+            <p:dialog modal="true" widgetVar="statusDialog" header="Status" draggable="false" closable="false"
+                      resizable="false">
+                <p:graphicImage value="#{resource['default/1_0/img/loadingbar.gif']}"/>
+            </p:dialog>
+
+        </h:panelGroup>
+
+        <script type="text/javascript">
+            function start() {
+                PF('statusDialog').show();
+            }
+
+            function stop() {
+                PF('statusDialog').hide();
+            }
+        </script>
+
+    </composite:implementation>
+
+</ui:component>

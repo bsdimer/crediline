@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:cl="http://java.sun.com/jsf/composite/components">
+
+<f:view contentType="text/html">
+<h:head>
+    <f:facet name="first">
+        <meta http-equiv="X-UA-Compatible" content="EmulateIE8"/>
+        <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
+        <title>Crediline Main View</title>
+    </f:facet>
+
+    <style type="text/css">
+        .ui-layout-north {
+            z-index: 20 !important;
+            overflow: visible !important;
+        }
+
+        .ui-layout-north .ui-layout-unit-content {
+            overflow: visible !important;
+        }
+    </style>
+
+    <!--     <script src = "https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> -->
+    <script src="https://www.java.com/js/deployJava.js" type="jscript"></script>
+    <h:outputScript library="js" name="fileDownloaderApplet.js"/>
+    <h:outputScript library="js" name="custom.js"/>
+    <h:outputScript library="js" name="deployJava.js"/>
+    <h:outputScript library="js" name="html2canvas.js"/>
+    <h:outputScript library="js" name="jquery.plugin.html2canvas.js"/>
+    <h:outputScript library="js" name="PluginDetect.js"/>
+    <h:outputScript library="js" name="qz.js"/>
+</h:head>
+
+
+<h:body onload="bootstrap();">
+<h:outputStylesheet library="default" name="css/def1.css"/>
+<h:outputStylesheet library="default" name="css/syntaxhighlighter.css"/>
+<h:outputStylesheet library="css" name="custom.css"/>
+<p:layout fullPage="true">
+
+<p:layoutUnit id="top" position="north" size="50">
+    <h:form>
+        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+            <p:commandButton value="#{msg['common.yes']}" type="button" styleClass="ui-confirmdialog-yes"
+                             icon="ui-icon-check"/>
+            <p:commandButton value="#{msg['common.no']}" type="button" styleClass="ui-confirmdialog-no"
+                             icon="ui-icon-close"/>
+        </p:confirmDialog>
+
+        <p:growl id="growl_#{cc.attrs.uniqueIndex}" showDetail="true" sticky="true"/>
+        <p:messages id="messages_#{cc.attrs.uniqueIndex}" showDetail="true"/>
+
+        <p:menubar>
+            <p:submenu label="#{msg['common.menu.new']}" icon="ui-icon-document">
+                <!-- id of the component must match the component name which will be generated as tab-->
+                <p:menuitem id="newPerson" value="#{msg['common.menu.customer']}"
+                            actionListener="#{menu.onClick}" icon="ui-icon-person"/>
+                <p:menuitem id="newCredit" value="#{msg['common.menu.credit']}"
+                            actionListener="#{menu.onClick}" icon="ui-icon-script"/>
+                <p:menuitem id="newIncome" value="#{msg['common.menu.income']}"
+                            actionListener="#{menu.onClick}" icon="ui-icon-arrowreturn-1-e"/>
+                <p:menuitem id="newOutcome" value="#{msg['common.menu.outcome']}"
+                            actionListener="#{menu.onClick}" icon="ui-icon-arrowreturn-1-w"/>
+                <p:menuitem id="newStreet" value="#{msg['common.menu.street']}"
+                            actionListener="#{menu.onClick}" icon="ui-icon-grip-dotted-horizontal"/>
+            </p:submenu>
+
+            <!--<p:submenu label="#{msg['common.menu.objects']}" icon="ui-icon-folder-open"
+                       actionListener="#{menu.onClick}">
+                <p:menuitem value="#{msg['common.menu.persons']}" url="#" icon="ui-icon-search"
+                            actionListener="#{menu.onClick}"/>
+                <p:menuitem value="#{msg['common.menu.credits']}" url="#" icon="ui-icon-search"
+                            actionListener="#{menu.onClick}"/>
+                <p:menuitem value="#{msg['common.menu.addresses']}" url="#" icon="ui-icon-search"
+                            actionListener="#{menu.onClick}"/>
+                <p:menuitem value="#{msg['common.menu.users']}" url="#" icon="ui-icon-search"
+                            actionListener="#{menu.onClick}"/>
+                <p:menuitem value="#{msg['common.menu.documents']}" url="#" icon="ui-icon-search"
+                            actionListener="#{menu.onClick}"/>
+
+                <p:menuitem value="#{msg['common.menu.logs']}" url="#" icon="ui-icon-search"
+                            actionListener="#{menu.onClick}"/>
+            </p:submenu>-->
+
+
+            <p:submenu label="#{msg['common.menu.selects']}" icon="ui-icon-search">
+                <p:menuitem id="inquiryPersons" value="#{msg['common.menu.persons']}"
+                            icon="ui-icon-search"
+                            actionListener="#{menu.onClick}">
+                </p:menuitem>
+                <p:menuitem id="inquiryTransactions" value="#{msg['common.transactions']}"
+                            icon="ui-icon-search"
+                            actionListener="#{menu.onClick}">
+                </p:menuitem>
+                <p:menuitem id="inquiryAllCredits" value="#{msg['common.all.fc']} #{msg['common.menu.credits']}"
+                            icon="ui-icon-search"
+                            actionListener="#{menu.onClick}">
+                </p:menuitem>
+                <p:menuitem id="inquiryFuturePayments" value="#{msg['common.futurePayments']}"
+                            icon="ui-icon-search" actionListener="#{menu.onClick}"/>
+                <p:menuitem id="inquiryProfits" value="#{msg['common.menu.profits']}" icon="ui-icon-search"
+                            actionListener="#{menu.onClick}">
+                </p:menuitem>
+                <p:menuitem id="inquiryOffices" value="#{msg['common.menu.offices']}" icon="ui-icon-search"
+                            actionListener="#{menu.onClick}"/>
+            </p:submenu>
+
+            <p:submenu label="#{msg['common.menu.control']}" icon="ui-icon-wrench">
+                <p:menuitem id="documentManagement" value="#{msg['common.menu.documentTemplateManager']}"
+                            rendered="#{sessionMB.currentRole.contains('ROLE_SUPERADMIN')}"
+                            actionListener="#{menu.onClick}" icon="ui-icon-print">
+                </p:menuitem>
+                <p:menuitem id="feeManagement" value="#{msg['common.menu.feeManager']}"
+                            rendered="#{sessionMB.currentRole.contains('ROLE_SUPERADMIN')}"
+                            actionListener="#{menu.onClick}" icon="ui-icon-lightbulb">
+                </p:menuitem>
+                <p:menuitem id="importManagement" value="#{msg['common.import']}"
+                            rendered="#{sessionMB.currentRole.contains('ROLE_SUPERADMIN')}"
+                            actionListener="#{menu.onClick}" icon="ui-icon-arrowthickstop-1-s">
+                </p:menuitem>
+                <p:menuitem id="schedulerManagement" value="#{msg['common.scheduler']}"
+                            rendered="#{sessionMB.currentRole.contains('ROLE_SUPERADMIN')}"
+                            actionListener="#{menu.onClick}" icon="ui-icon-clock">
+                </p:menuitem>
+                <p:menuitem id="changePassword" value="#{msg['common.change.password']}"
+                            onclick="PF('changePasswordDialog').show()" icon="ui-icon-key">
+                </p:menuitem>
+            </p:submenu>
+
+            <p:submenu label="#{msg['common.menu.report']}" icon="ui-icon-calculator"
+                       rendered="#{sessionMB.currentRole.contains('ROLE_SUPERADMIN')}">
+                <p:menuitem>
+                    <p:commandLink id="dailyReport" styleClass="ui-menuitem-link"
+                                   actionListener="#{printerBean.onPrint}">
+                        <h:outputText styleClass="ui-menuitem-text" value="#{msg['common.menu.daily-report']}"/>
+                        <p:confirm header="#{msg['common.report.confirm.header']}"
+                                   message="#{msg['common.report.confirm.message']}" icon="ui-icon-alert"/>
+                    </p:commandLink>
+                </p:menuitem>
+                <p:menuitem>
+                    <p:commandLink id="interimReport" styleClass="ui-menuitem-link"
+                                   actionListener="#{printerBean.onPrint}">
+                        <!-- 						         <h:outputText styleClass="ui-menuitem-icon ui-icon ui-icon-print" /> -->
+                        <h:outputText styleClass="ui-menuitem-text" value="#{msg['common.menu.interim-report']}"/>
+                        <p:confirm header="#{msg['common.report.confirm.header']}"
+                                   message="#{msg['common.report.confirm.message']}" icon="ui-icon-alert"/>
+                    </p:commandLink>
+                </p:menuitem>
+                <p:menuitem id="creditRegisterReport" value="#{msg['common.menu.register']}"
+                            actionListener="#{menu.onClick}"/>
+            </p:submenu>
+
+            <p:submenu label="#{msg['common.menu.help']}" icon="ui-icon-help">
+                <p:menuitem value="#{msg['common.menu.indexes']}" url="#"/>
+                <p:menuitem value="#{msg['common.menu.exit']}" url="#{request.contextPath}/j_spring_security_logout"/>
+            </p:submenu>
+
+            <!--<f:facet name="options">
+                <h:outputLink style="font-weight: bold; margin-left: 20px;"
+                              value="#{request.contextPath}/j_spring_security_logout">#{msg['common.menu.exit']}</h:outputLink>
+            </f:facet>-->
+        </p:menubar>
+    </h:form>
+</p:layoutUnit>
+
+<p:layoutUnit id="bottom" position="south" size="50">
+    <h:panelGroup layout="block"
+                  style="width: 100% !important; height: 100% !important; background-color: #808080 !important;">
+        <h:outputText styleClass="text-footer" value="#{msg['common.current.user']}: #{sessionMB.currentUser.username}"
+                      style="color: #ffffff"/><br/>
+        <h:outputText styleClass="text-footer" value="#{msg['login.footer.text2']}" style="color: #ffffff"/>
+    </h:panelGroup>
+</p:layoutUnit>
+
+<!--<p:layoutUnit id="left" position="west" size="300" resizable="true" closable="true" collapsible="true"
+              header="Options" minSize="200">
+    <p:accordionPanel>
+        <p:tab title="Menu 1">
+            <br/>
+            <p:calendar mode="inline" navigator="none"/>
+            <br/>
+        </p:tab>
+
+        <p:tab title="Menu 2">
+            <h:outputText value="Menu 2 Content"/>
+        </p:tab>
+
+        <p:tab title="Menu 3">
+            <h:outputText value="Menu 3 Content"/>
+        </p:tab>
+    </p:accordionPanel>
+</p:layoutUnit>-->
+
+<p:layoutUnit id="center" position="center"
+              style="width: 100%; height: 100%">
+
+    <!-- Flat view i.e. without Tabs -->
+    <!--<p:panel id="mainPanel" header="#{mainPanelBean.header}" rendered="#{mainPanelBean.rendered}">
+        <ui:include src="#{mainPanelBean.url}">
+            <ui:param name="managedBean" value="#{mainPanelBean.bean}"/>
+            <ui:param name="uniqueIndex" value="#{mainPanelBean.index}"/>
+        </ui:include>
+    </p:panel>-->
+    <p:tabView id="tabPanel" scrollable="false" dynamic="true" cache="false"
+               activeIndex="#{tabView.activeIndex}"
+               style="width: 99%; height: 98%; border: none">
+        <p:ajax event="tabClose" listener="#{tabView.onTabClose}"/>
+        <p:ajax event="tabChange" listener="#{tabView.onTabChange}"/>
+
+        <!--ToDo: should be composed as a component -->
+        <p:tab title="#{msg['common.statistics']}" closable="false">
+
+
+            <!--<p:fieldset legend="#{msg['common.availability.case']}"
+                        toggleable="true" toggleSpeed="500" style="margin-top: 10px;">
+
+            <h:panelGrid id="statisticGrid_#{cc.attrs.uniqueIndex}"
+                         columns="2" columnClasses="label, value" styleClass="grid">
+
+                <p:outputLabel value="#{msg['common.date']}"/>
+                <p:outputLabel id="statisticDate_#{cc.attrs.uniqueIndex}"
+                               value="#{statisticBean.todayDateString}"/>
+
+                <p:outputLabel value="#{msg['statistic.loan']}"/>
+                <p:outputLabel id="loansStatistic_#{cc.attrs.uniqueIndex}"
+                               value="#{statisticBean.creditCount}"/>
+
+                <p:outputLabel value="#{msg['statistic.outcomes']}"/>
+                <p:outputLabel id="statisticOutcomes_#{cc.attrs.uniqueIndex}"
+                               value="#{statisticBean.outcomesSum}"/>
+
+                <p:outputLabel value="#{msg['statistic.credit.outcomes']}"/>
+                <p:outputLabel id="statisticCreditOtcomes_#{cc.attrs.uniqueIndex}"
+                               value="#{statisticBean.outcomesSumForCredits}"/>
+
+                <p:outputLabel value="#{msg['statistic.other.outcomes']}"/>
+                <p:outputLabel id="statisticOtherOutcomes_#{cc.attrs.uniqueIndex}"
+                               value="#{statisticBean.outcomesSumForOther}"/>
+
+                <p:outputLabel value="#{msg['statistic.incomes']}"/>
+                <p:outputLabel
+                        id="statisticIncomes_#{cc.attrs.uniqueIndex}"
+                        value="#{statisticBean.incomesSum}"/>
+
+                <p:outputLabel value="#{msg['common.availability.case']}"/>
+                <p:outputLabel id="statisticAvailabilityCashCase_#{cc.attrs.uniqueIndex}"
+                               value="#{statisticBean.cashCaseSum}"/>
+            </h:panelGrid>
+        </p:fieldset>
+
+        <p:commandButton id="refresh_#{cc.attrs.uniqueIndex}" ajax="true" value="#{msg['common.refresh']}" actionListener="#{statisticBean.refresh}" update="statisticGrid_#{cc.attrs.uniqueIndex}"/>&ndash;&gt;
+         -->
+            <!--<h:form>
+                <h:panelGroup layout="block" style="width: 100%; height: 600px">
+                    <h:panelGroup id="topicDiv" layout="block"
+                                  style="width: 100%; height: 50; background-color: lightblue">
+                        <p:notificationBar id="topicBar" position="top" effect="slide"
+                                           widgetVar="notificationBar"
+                                           styleClass="top">
+                            <h:outputText value="#{messageServiceMB.topic}"
+                                          style="color:#FFCC00;font-size:36px;"/>
+                        </p:notificationBar>
+                    </h:panelGroup>
+                    &lt;!&ndash;<p:poll interval="10" update="@form"/>&ndash;&gt;
+                    <p:dataList value="#{eventMB.events}" var="event" id="events"
+                                paginator="true" rows="10"
+                                paginatorTemplate="{PreviousPageLink} {CurrentPageReport} {NextPageLink} {RowsPerPageDropdown}"
+                                rowsPerPageTemplate="5,10,15" type="none" style="width: 100%; height: 400px">
+
+                        <f:facet name="header">
+                            #{msg['common.events']}
+                        </f:facet>
+
+                        <p:commandButton icon="ui-icon-search"
+                                         title="#{msg['common.details']}"
+                                         style="margin-left: 10px">
+                            <f:setPropertyActionListener value="#{event}"
+                                                         target="#{eventMB.selectedEvent}"/>
+                        </p:commandButton>
+
+                        <h:outputText value="#{event.creationDate}, #{event.createdBy}, #{event.value}"
+                                      style="margin-left:10px"/>
+                        <br/>
+                    </p:dataList>
+                </h:panelGroup>
+
+                #{msg['common.news']}
+                #{msg['common.statistics']}
+                <p:dialog header="#{msg['common.details']}" widgetVar="eventDialog" modal="true"
+                          showEffect="fade" closable="true">
+                    <p:outputPanel id="eventDetail" style="text-align:center;" layout="block">
+
+                        &lt;!&ndash;<p:graphicImage
+                             value="/images/cars/#{tableBean.selectedCar.manufacturer}.jpg"/>&ndash;&gt;
+
+                        <h:panelGrid columns="2" cellpadding="5">
+                            <h:outputLabel for="eventId" value="Event ID: "/>
+                            <h:outputText id="eventId" value="#{eventMB.selectedEvent.id}"/>
+
+                            <h:outputLabel for="eventTime" value="Event time: "/>
+                            <h:outputText id="eventTime" value="#{eventMB.selectedEvent.creationDate}"/>
+
+                            <h:outputLabel for="userId" value="User ID: "/>
+                            <h:outputText id="userId" value="#{eventMB.selectedEvent.createdBy}"/>
+
+                            &lt;!&ndash;<h:outputLabel for="color" value="Color: "/>
+                            <h:outputText id="color" value="#{tableBean.selectedCar.color}"
+                                          style="color:#{tableBean.selectedCar.color}"/>&ndash;&gt;
+                        </h:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>
+            </h:form>-->
+        </p:tab>
+
+        <c:forEach items="#{tabView.tabs}" var="tab" varStatus="loop">
+            <p:tab titletip="#{tab.id}" title="#{tab.label}" closable="#{tab.bean.closable}">
+                <ui:include src="#{tab.url}">
+                    <ui:param name="managedBean" value="#{tab.bean}"/>
+                    <ui:param name="uniqueIndex" value="#{loop.index}"/>
+                </ui:include>
+            </p:tab>
+        </c:forEach>
+    </p:tabView>
+
+    <div id="applet_container">&#160;</div>
+
+</p:layoutUnit>
+
+<!--<p:layoutUnit position="east" size="200" header="#{msg['common.communication']}" resizable="true"
+              closable="false" collapsible="true"
+              effect="drop">
+</p:layoutUnit>-->
+
+<p:ajaxStatus style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+    <f:facet name="start">
+        <p:graphicImage value="resources/default/1_0/img/loading.gif"/>
+    </f:facet>
+
+    <f:facet name="complete">
+        <h:outputText value=""/>
+    </f:facet>
+</p:ajaxStatus>
+
+<p:dialog header="#{msg['common.change.password']}" widgetVar="changePasswordDialog" resizable="false">
+    <h:form id="form_changePassword">
+        <p:panel id="changePasswordPanel">
+            <h:panelGrid styleClass="grid" columns="2" style="margin-bottom:10px">
+                <h:outputLabel for="current_password" value="#{msg['change.password.current.pass']}"/>
+                <p:password id="current_password" required="true"
+                            requiredMessage="#{msg['change.password.current.required']}"
+                            value="#{securityBean.currentPassword}"/>
+                <h:outputLabel for="new_password" value="#{msg['change.password.new.pass']}"/>
+                <p:password id="new_password" match="confirm_new_password" required="true"
+                            requiredMessage="#{msg['change.password.new.required']}"
+                            validatorMessage="#{msg['change.password.match.error']}"
+                            value="#{securityBean.newPassword}"/>
+                <h:outputLabel for="confirm_new_password"
+                               value="#{msg['change.password.new.pass.confirm']}"/>
+                <p:password id="confirm_new_password" required="true"
+                            requiredMessage="#{msg['change.password.newconfirm.required']}"
+                            value="#{securityBean.confirmNewPassword}"/>
+            </h:panelGrid>
+            <p:messages id="changePassowrdMessages" showDetail="false" autoUpdate="true" closable="true"/>
+        </p:panel>
+        <p:commandButton id="submitButton" value="#{msg['change.password.button']}" ajax="true"
+                         update="changePasswordPanel" action="#{securityBean.changePassword}" style="margin-top: 10px"/>
+    </h:form>
+</p:dialog>
+
+</p:layout>
+</h:body>
+
+</f:view>
+</HTML>
+

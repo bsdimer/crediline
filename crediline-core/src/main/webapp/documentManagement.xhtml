@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:components="http://java.sun.com/jsf/composite/components">
+<f:view>
+
+    <h:form style="float:left; width: 100%; height: 100%;">
+        <p:messages id="messages" showDetail="true"/>
+        <p:toolbar style="margin-bottom: 10px">
+            <f:facet name="left">
+                <p:commandButton title="#{msg['common.add']}" icon="ui-icon-document"
+                                 actionListener="#{documentTemplateMB.createTemplate}"
+                                 update="@form:documentTemplateList"/>
+                <p:separator/>
+                <p:commandButton title="#{msg['common.delete']}" icon="ui-icon-trash"
+                                 actionListener="#{documentTemplateMB.deleteSelectedTemplate}"
+                                 update="@form:documentTemplateList"/>
+                <p:separator/>
+                <p:commandButton title="#{msg['common.refresh']}" icon="ui-icon-refresh"
+                                 actionListener="#{documentTemplateMB.refresh}"
+                                 update="@form:documentTemplateList"/>
+            </f:facet>
+
+            <!--<p:toolbarGroup align="right">
+                <p:menuButton value="Options">
+                    &lt;!&ndash;<p:menuitem value="Home" url="http://www.primefaces.org"/>&ndash;&gt;
+                    <p:menuitem value="ShowCase"/>
+                    <p:menuitem value="TouchFaces"/>
+                </p:menuButton>
+            </p:toolbarGroup>-->
+
+        </p:toolbar>
+
+        <p:dataTable var="template" value="#{documentTemplateMB.allDocumentTemplates}"
+                     style="float: left; width: 100%; height: 100%"
+                     id="documentTemplateList"
+                     editable="true"
+                     selection="#{documentTemplateMB.selectedTemplate}" selectionMode="single"
+                     rowKey="#{template.id}">
+
+            <f:facet name="header">
+                #{msg['document.documentTemplates']}
+            </f:facet>
+
+            <p:ajax event="rowEdit" listener="#{documentTemplateMB.onEdit}" immediate="true"
+                    update="@this, @form:messages"/>
+            <p:ajax event="rowEditCancel" listener="#{documentTemplateMB.onCancel}" update="@this"/>
+            <p:ajax event="rowSelect" listener="#{documentTemplateMB.onSelect}"
+                    update="@widgetVar(ttsEditor)"/>
+
+            <p:column width="60">
+                #{template.id}
+            </p:column>
+
+            <p:column headerText="#{msg['common.name']}">
+                <p:cellEditor>
+                    <f:facet name="output">
+                        <h:outputText value="#{template.name}"/>
+                    </f:facet>
+                    <f:facet name="input">
+                        <p:inputText value="#{template.name}" style="width:100%"/>
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column headerText="#{msg['common.documentTemplatePurpose']}" width="160">
+                <p:cellEditor>
+                    <f:facet name="output"><h:outputText value="#{template.documentTemplatePurpose}"/></f:facet>
+                    <f:facet name="input">
+                        <h:selectOneMenu value="#{template.documentTemplatePurpose}" style="width:100%">
+                            <f:selectItems value="#{data.documentTemplatePurposes}" var="documentTemplatePurposes"
+                                           itemLabel="#{documentTemplatePurposes}"
+                                           itemValue="#{documentTemplatePurposes}"/>
+                        </h:selectOneMenu>
+                    </f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column headerText="#{msg['common.creation-date']}" width="160">
+                #{template.creationDate.toString('dd/MM/yyyy HH:mm:ss')}
+            </p:column>
+
+            <p:column headerText="#{msg['common.modification-date']}" width="160">
+                #{template.modificationDate.toString('dd/MM/yyyy HH:mm:ss')}
+            </p:column>
+
+            <p:column headerText="#{msg['common.updatedBy']}" width="160">
+                #{template.createdBy.username}
+            </p:column>
+
+            <p:column headerText="#{msg['common.createdBy']}" width="160">
+                #{template.createdBy.username}
+            </p:column>
+
+            <p:column width="40">
+                <p:commandButton oncomplete="PF('templateDialog').show()" update="@widgetVar(ttsEditor)"
+                                 icon="ui-icon-search" title="#{msg['common.detailCheck']}" ajax="true">
+                    <f:setPropertyActionListener value="#{template}"
+                                                 target="#{documentTemplateMB.selectedTemplate}"/>
+                </p:commandButton>
+            </p:column>
+
+            <p:column width="60">
+                <p:commandButton icon="ui-icon-arrowstop-1-s" value="PDF" title="#{msg['common.download']}"
+                                 ajax="false">
+                    <f:setPropertyActionListener value="#{template}"
+                                                 target="#{documentTemplateMB.selectedTemplate}"/>
+                    <p:fileDownload value="#{documentTemplateMB.pdf}"/>
+                </p:commandButton>
+            </p:column>
+
+            <p:column width="40">
+                <p:rowEditor/>
+            </p:column>
+        </p:dataTable>
+
+    </h:form>
+
+    <p:dialog header="#{msg['common.documentBlank']}" widgetVar="templateDialog"
+              resizable="true" modal="true" showEffect="fade" hideEffect="explode" style="width: auto; height: auto"
+              closeOnEscape="true" appendTo="@(body)">
+        <h:form>
+            <h:panelGrid columns="2" cellpadding="4" style="margin:0 auto;">
+                <h:panelGrid columns="1" style="width: 97%; margin-top: 10px">
+
+                    <p:toolbar style="margin-bottom: 10px">
+                        <f:facet name="left">
+                            <p:commandButton title="#{msg['common.menu.save']}" icon="ui-icon-disk" update="@form"
+                                             actionListener="#{documentTemplateMB.saveSelectedTemplate}"/>
+                            <p:separator/>
+                            <p:commandButton title="#{msg['common.print']}" icon="ui-icon-print"/>
+                        </f:facet>
+
+                        <!--<p:toolbarGroup align="right">
+                            <p:menuButton value="Options">
+                                &lt;!&ndash;<p:menuitem value="Home" url="http://www.primefaces.org"/>&ndash;&gt;
+                                <p:menuitem value="ShowCase"/>
+                                <p:menuitem value="TouchFaces"/>
+                            </p:menuButton>
+                        </p:toolbarGroup>-->
+
+                    </p:toolbar>
+
+                    <h:outputText value="#{msg['common.content'] }"/>
+                    <p:editor widgetVar="ttsEditor" width="800" height="500"
+                              value="#{documentTemplateMB.selectedTemplate.source}">
+                    </p:editor>
+                </h:panelGrid>
+            </h:panelGrid>
+        </h:form>
+    </p:dialog>
+
+
+</f:view>
+</html>

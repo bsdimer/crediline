@@ -1,0 +1,87 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+	   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+	   http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+	   http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+	   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <jpa:repositories base-package="com.crediline.dao"
+                      entity-manager-factory-ref="entityManagerFactory"
+                      transaction-manager-ref="transactionManager"/>
+
+    <context:component-scan base-package="com.crediline.service"/>
+    <context:component-scan base-package="com.crediline.dao"/>
+    <context:component-scan base-package="com.crediline.event"/>
+    <context:component-scan base-package="com.crediline.dataimport"/>
+    <context:component-scan base-package="com.crediline.utils"/>
+    <context:component-scan base-package="com.crediline.mb"/>
+    <context:component-scan base-package="com.crediline.view.converter"/>
+    <context:component-scan base-package="com.crediline.files"/>
+    <context:component-scan base-package="com.crediline.documents"/>
+
+    <task:annotation-driven/>
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+    <context:annotation-config/>
+
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="persistenceUnitName" value="crediline"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/crediline"/>
+        <property name="username" value="crediline"/>
+        <property name="password" value="mitko78"/>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <bean id="persistenceExceptionTranslationPostProcessor"
+          class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+
+    <!-- LazySerializationException workaround -->
+    <bean id="openSessionInViewInterceptor"
+          class="org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+
+    <!--<bean id="eventAspectBean" class="com.crediline.aop.EventAspectBean" factory-method="aspectOf"/>-->
+
+    <bean id="scheduler" class="com.crediline.utils.Scheduler"/>
+
+    <bean id="tabConfig" class="com.crediline.view.TabConfig">
+        <property name="tabViewMap">
+            <map key-type="java.lang.String" value-type="java.lang.String">
+                <entry key="newCredit" value="creditWizard"/>
+                <entry key="newPerson" value="personBean"/>
+                <entry key="newIncome" value="incomeBean"/>
+                <entry key="newRegion" value="regionBean"/>
+                <entry key="newTransaction" value="transactionBean"/>
+                <entry key="newOffice" value="officeBean"/>
+                <entry key="newUser" value="userBean"/>
+                <entry key="newStreet" value="streetBean"/>
+                <entry key="documentManagement" value="documentTemplateMB"/>
+                <entry key="inquiryPredefined" value="inquiryPredefinedMB"/>
+                <entry key="inquiryProfits" value="inquiryPredefinedMB"/>
+                <entry key="inquiryInsurances" value="inquiryInsurances"/>
+                <entry key="inquiryOverdueCredits" value="inquiryOverdueCreditsMB"/>
+                <entry key="inquiryAllCredits" value="inquiryCredits"/>
+                <entry key="creditRegisterReport" value="creditRegisterReportBean"/>
+                <entry key="schedulerManagement" value="scheduleManagement"/>
+                <entry key="inquiryTransactions" value="inquiryTransactions"/>
+            </map>
+        </property>
+    </bean>
+
+</beans>

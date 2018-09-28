@@ -1,0 +1,141 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:c="http://java.sun.com/jsp/jstl/core"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:components="http://java.sun.com/jsf/composite/components">
+
+    <composite:interface>
+        <composite:attribute name="managedBean" required="true"/>
+        <composite:attribute name="uniqueIndex" required="true"/>
+    </composite:interface>
+
+    <composite:implementation>
+        <h:panelGroup layout="block" style="float: left; padding: 10px; width: 100%">
+
+            <h:form id="mainContactsForm_#{cc.attrs.uniqueIndex}" style="width: 100%" prependId="false">
+
+                <p:growl id="growl_#{cc.attrs.uniqueIndex}" showDetail="true" sticky="true"/>
+                <p:messages id="messages_#{cc.attrs.uniqueIndex}" showDetail="true"/>
+
+                <p:toolbar>
+                    <p:toolbarGroup align="left" style="width: 100%">
+                        <p:commandButton title="#{msg['common.menu.search']}" icon="ui-icon-search"
+                                         actionListener="#{cc.attrs.managedBean.refresh}"
+                                         update="@form:mainContainer_#{cc.attrs.uniqueIndex}"/>
+                        <p:commandButton title="#{msg['common.print']}" icon="ui-icon-print">
+                            <p:printer target="mainContainer_#{cc.attrs.uniqueIndex}"/>
+                        </p:commandButton>
+                    </p:toolbarGroup>
+                </p:toolbar>
+
+
+                <h:panelGroup layout="block" id="mainContainer_#{cc.attrs.uniqueIndex}"
+                              style="height: 100%; width: 100%">
+
+                    <h:outputText style="margin: 20px 10px 15px;"
+                                  value="#{msg['common.countResults']}: #{cc.attrs.managedBean.result.size()}"/>
+                    <p:dataTable var="office" value="#{cc.attrs.managedBean.result}" scrollRows="30"
+                                 scrollable="true" liveScroll="true" scrollHeight="625"
+                                 lazy="true"
+                                 id="tableResult_#{cc.attrs.uniqueIndex}"
+                                 widgetVar="resultTable_#{cc.attrs.uniqueIndex}"
+                                 filteredValue="#{cc.attrs.managedBean.filteredOffices}">
+
+                        <p:column headerText="ID" width="40" sortBy="id">
+                            <h:outputText value="#{office.id}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg['common.name']}" sortBy="name" width="120">
+                            <h:outputText value="#{office.name}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg['common.menu.region']}" width="120">
+                            <h:outputText value="#{office.region.name}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg['common.menu.address']}">
+                            <h:outputText value="#{office.address}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg['common.manager']}">
+                            <h:outputText value="#{empty office.manager ? '' : office.manager.fullName }"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg['common.contacts.phones']}">
+                            <c:forEach items="#{office.phones}" var="phone">
+                                <h:outputText value="#{phone.number} "/>
+                            </c:forEach>
+                        </p:column>
+
+
+                        <p:column style="width:30px">
+                            <p:commandButton id="officeDetailedViewButton_#{cc.attrs.uniqueIndex}"
+                                             update="@form:dialogOfficeDetails_#{cc.attrs.uniqueIndex}"
+                                             oncomplete="PF('dialogOfficeDetails_#{cc.attrs.uniqueIndex}').show()"
+                                             icon="ui-icon-search"
+                                             title="View">
+                                <f:setPropertyActionListener value="#{office}"
+                                                             target="#{cc.attrs.managedBean.selectedOffice}"/>
+                            </p:commandButton>
+                        </p:column>
+
+                        <p:column style="width:30px">
+                            <p:commandButton id="officeEditButton_#{cc.attrs.uniqueIndex}"
+                                             update="@form:officeEditorPG_#{cc.attrs.uniqueIndex}"
+                                             oncomplete="PF('officeEditor_#{cc.attrs.uniqueIndex}').show()"
+                                             icon="ui-icon-pencil"
+                                             title="Edit">
+                                <f:setPropertyActionListener value="#{office}"
+                                                             target="#{cc.attrs.managedBean.selectedOffice}"/>
+                            </p:commandButton>
+                        </p:column>
+
+                    </p:dataTable>
+                </h:panelGroup>
+
+
+                <p:dialog id="dialogOfficeDetails_#{cc.attrs.uniqueIndex}" header="#{msg['common.details']}"
+                          widgetVar="dialogOfficeDetails_#{cc.attrs.uniqueIndex}"
+                          resizable="true" showEffect="fade" hideEffect="explode"
+                          style="width: auto !important;" height="400"
+                          closeOnEscape="true"
+                          dynamic="true">
+
+                    <h:panelGroup layout="block" id="officeDetailsPG_#{cc.attrs.uniqueIndex}">
+
+                        <components:OfficeViewComponent uniqueIndex="#{cc.attrs.uniqueIndex}"
+                                                        managedBean="#{cc.attrs.managedBean.updateOfficeBean}"/>
+                    </h:panelGroup>
+                </p:dialog>
+
+                <p:dialog id="officeEditor_#{cc.attrs.uniqueIndex}" header="#{msg['common.menu.edit']}"
+                          widgetVar="officeEditor_#{cc.attrs.uniqueIndex}"
+                          style="width: auto !important;" height="400"
+                          resizable="true" showEffect="fade" hideEffect="explode"
+                          closeOnEscape="true"
+                          dynamic="true">
+
+                    <h:panelGroup layout="block" id="officeEditorPG_#{cc.attrs.uniqueIndex}">
+                        <components:EditOfficeComponent uniqueIndex="#{cc.attrs.uniqueIndex}"
+                                                        managedBean="#{cc.attrs.managedBean.updateOfficeBean}"/>
+                    </h:panelGroup>
+                </p:dialog>
+
+                <h:panelGroup layout="block" style="clear: both; width: 100%; margin-top: 20px">
+                    <p:toolbar style="margin-top: 20px">
+                        <p:toolbarGroup align="left" style="width: 100%">
+                            <p:commandButton title="#{msg['common.menu.search']}" icon="ui-icon-search"
+                                             actionListener="#{cc.attrs.managedBean.refresh}"
+                                             update="@form:mainContainer_#{cc.attrs.uniqueIndex}"/>
+                            <p:commandButton title="#{msg['common.print']}" icon="ui-icon-print">
+                                <p:printer target="mainContainer_#{cc.attrs.uniqueIndex}"/>
+                            </p:commandButton>
+                        </p:toolbarGroup>
+                    </p:toolbar>
+                </h:panelGroup>
+            </h:form>
+        </h:panelGroup>
+    </composite:implementation>
+
+</ui:component>

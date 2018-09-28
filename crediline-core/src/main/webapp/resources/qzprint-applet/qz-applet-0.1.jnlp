@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp href="qz-applet-0.1.jnlp" spec="1.0+">
+    <information>
+        <title>QZ Printing applet Applet</title>
+        <vendor>Crediline PLC</vendor>
+
+        <association extensions="jnlp" mime-type="application/x-java-jnlp-file"/>
+        <shortcut online='false'>
+            <desktop/>
+        </shortcut>
+    </information>
+
+    <security>
+        <all-permissions/>
+    </security>
+
+    <update check="always" policy="always"/>
+
+    <resources>
+        <property name='jnlp.file.extension' value="jnlp"/>
+        <j2se href="http://java.sun.com/products/autodl/j2se" version="1.6+"/>
+        <jar href="qz-applet-0.1.jar" main="true"/>
+        <!-- Todo must sign these jars with the same cert -->
+        <!--<jar href="lib/jssc_qz.jar" eager="false" download="lazy"/>
+        <jar href="lib/pdf-renderer_qz.jar" eager="false" download="lazy"/>-->
+    </resources>
+
+    <applet-desc name="QZ Print Plugin" main-class="qz.PrintApplet" width="100" height="100"/>
+</jnlp>

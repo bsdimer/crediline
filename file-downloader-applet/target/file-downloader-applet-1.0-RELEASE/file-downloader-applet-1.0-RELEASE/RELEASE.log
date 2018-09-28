@@ -1,0 +1,15 @@
+------------------------
+Ver. 1.0-RELEASE
+------------------------
+Functionalists:
+- Supports any 32 and 64 bit OS
+- Supports most of the nowadays web browsers
+- Supports downloading of file in user home directory
+
+Bundle artifacts:
+- main.jnlp - applet is working under the jnlp protocol
+- *.jar - the applet itself
+- RELEASE.log - release log
+- *.js - the js integration layer between frontend and backend
+- rootCA.cer - root certificate used for applet jar signing
+- README.log - instructions for setup and using of the applet

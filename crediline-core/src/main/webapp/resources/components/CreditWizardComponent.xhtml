@@ -1,0 +1,851 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html"
+              xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:pe="http://primefaces.org/ui/extensions"
+              xmlns:components="http://java.sun.com/jsf/composite/components"
+              xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<composite:interface>
+    <composite:attribute name="managedBean" required="true" type="com.crediline.mb.CreditWizardMB"/>
+    <composite:attribute name="uniqueIndex" required="true"/>
+</composite:interface>
+
+<composite:implementation>
+<h:form style="height: 100% !important;">
+
+<p:focus for="creditSum_#{cc.attrs.uniqueIndex}"/>
+<p:defaultCommand target="#{cc.attrs.managedBean.getDefaultCommandId(cc.attrs.uniqueIndex)}"/>
+<!--<p:hotkey bind="ctrl+shift+n" actionListener="#{tabView.addTab('newCredit',msg['common.menu.credit'])}"
+          update="@widgetVar(tabView)"/>-->
+<p:hotkey bind="left" actionListener="#{cc.attrs.managedBean.moveTabBack}"
+          update="tabView_#{cc.attrs.uniqueIndex}"/>
+<p:hotkey bind="right" actionListener="#{cc.attrs.managedBean.moveTabForward}"
+          update="tabView_#{cc.attrs.uniqueIndex}"/>
+<p:hotkey bind="ctrl+shift+p" actionListener="#{cc.attrs.managedBean.printCurrentDocumentHTML}"/>
+<p:hotkey bind="ctrl+p" actionListener="#{cc.attrs.managedBean.printCurrentDocumentHTML}"/>
+<!--<p:hotkey bind="ctrl+p" actionListener="#{cc.attrs.managedBean.printCurrentDocumentPDF}"/>-->
+<!--<p:hotkey bind="ctrl+h" actionListener="#{cc.attrs.managedBean.printCurrentDocumentHTML}"/>
+<p:hotkey bind="ctrl+e" actionListener="#{cc.attrs.managedBean.printEditorContent}"/>-->
+
+<div>&#160;</div>
+
+<pe:masterDetail id="masterDetail" level="#{cc.attrs.managedBean.currentLevel}" showBreadcrumb="false">
+
+<f:facet name="header">
+    <p:messages id="creditMessages_#{cc.attrs.uniqueIndex}" showDetail="true"/>
+    <!--<h:panelGroup layout="block" style="margin-top: 10px;">
+        <h:panelGroup styleClass="levelTitle ui-state-default ui-corner-all
+                                  #{cc.attrs.managedBean.currentLevel eq 1 ? 'ui-state-hover' : ''}">
+            <h:outputText value="Personal"/>
+        </h:panelGroup>
+        <h:panelGroup styleClass="levelTitle ui-state-default ui-corner-all
+                                  #{cc.attrs.managedBean.currentLevel eq 2 ? 'ui-state-hover' : ''}">
+            <h:outputText value="Address"/>
+        </h:panelGroup>
+    </h:panelGroup>-->
+</f:facet>
+
+<pe:masterDetailLevel id="calculatorTab_#{cc.attrs.uniqueIndex}" level="1" levelLabel="#{msg['common.calc']}">
+
+<p:toolbar>
+    <f:facet name="left">
+        <p:commandButton id="showSaveDialogBtn_#{cc.attrs.uniqueIndex}" title="#{msg['common.menu.save']}"
+                         icon="ui-icon-disk" action="#{cc.attrs.managedBean.save}"
+                         value="#{msg['common.menu.save']}" update="@form" oncomplete="location.reload()">
+            <p:confirm header="#{msg['common.confirmation']}" message="#{msg['common.saveConfirm']}"
+                       icon="ui-icon-alert"/>
+        </p:commandButton>
+        <p:separator/>
+        <p:commandButton icon="ui-icon-closethick" title="#{msg['common.decline']}"
+                         actionListener="#{cc.attrs.managedBean.decline}">
+            <p:confirm header="#{msg['common.confirmation']}" message="#{msg['common.declineQuestion']}"
+                       icon="ui-icon-alert"/>
+        </p:commandButton>
+        <p:separator/>
+        <p:commandButton type="button" title="#{msg['common.print']}" icon="ui-icon-print"/>
+    </f:facet>
+</p:toolbar>
+
+<h:panelGrid columns="4" styleClass="grid">
+
+<h:outputText value="#{msg['common.credit-sum']}" style="font-weight: bold"/>
+<h:panelGroup layout="block">
+
+    <p:inputText id="creditSum_#{cc.attrs.uniqueIndex}" required="true"
+                 label="#{msg['common.credit-sum']}" widgetVar="sumInputText"
+                 value="#{cc.attrs.managedBean.creditSum}" tabindex="1" onkeydown="enter2tab()">
+        <f:convertNumber minIntegerDigits="1" maxIntegerDigits="5" maxFractionDigits="2"
+                         minFractionDigits="2"/>
+        <f:validateDoubleRange minimum="0.0" maximum="10000000.00"/>
+        <p:ajax listener="#{cc.attrs.managedBean.recalculate}" update="creditMessages_#{cc.attrs.uniqueIndex},
+        applicationFee_#{cc.attrs.uniqueIndex},realRate_#{cc.attrs.uniqueIndex}, gpr_#{cc.attrs.uniqueIndex},
+        endSum_#{cc.attrs.uniqueIndex}, calculationTable_#{cc.attrs.uniqueIndex}" event="keyup"/>
+    </p:inputText>
+    <h:outputText style="margin-left: 10px" value="#{cc.attrs.managedBean.defaultCurrency}."/>
+</h:panelGroup>
+
+<h:outputText value="#{msg['common.credit-date-recieve']}" style="font-weight: bold"/>
+<p:calendar value="#{cc.attrs.managedBean.credit.pickUpDate}" pattern="dd/MM/yyyy"
+            showButtonPanel="true" navigator="true" converter="dateConverter"
+            mode="popup" showOn="button" popupIconOnly="true" tabindex="7"/>
+
+<h:outputText value="#{msg['common.credit-time']}" style="font-weight: bold"/>
+<h:panelGroup layout="block">
+    <p:inputText id="creditTime_#{cc.attrs.uniqueIndex}" required="true"
+                 label="#{msg['common.credit-time']}"
+                 value="#{cc.attrs.managedBean.creditPeriod}" tabindex="2">
+        <f:validateLongRange minimum="1" maximum="60"/>
+        <p:ajax listener="#{cc.attrs.managedBean.recalculate}" update="creditMessages_#{cc.attrs.uniqueIndex},
+        applicationFee_#{cc.attrs.uniqueIndex},realRate_#{cc.attrs.uniqueIndex}, gpr_#{cc.attrs.uniqueIndex},
+        endSum_#{cc.attrs.uniqueIndex}, calculationTable_#{cc.attrs.uniqueIndex}" event="keyup"/>
+    </p:inputText>
+    <h:outputText style="margin-left: 10px" value="#{msg['common.months']}"/>
+</h:panelGroup>
+
+<h:outputText value="#{msg['common.payment.due-date']}" style="font-weight: bold"/>
+<p:calendar value="#{cc.attrs.managedBean.startDueDate}" pattern="dd/MM/yyyy"
+            showButtonPanel="true" navigator="true" converter="dateConverter"
+            mode="popup" showOn="button" popupIconOnly="true" tabindex="8">
+    <p:ajax event="dateSelect" listener="#{cc.attrs.managedBean.updateStartDueDate}"
+            update="calculationTable_#{cc.attrs.uniqueIndex}"/>
+</p:calendar>
+
+<h:outputText value="#{msg['common.credit-month-interest']}" style="font-weight: bold"/>
+<h:panelGroup layout="block">
+    <p:inputText id="creditInterest_#{cc.attrs.uniqueIndex}" required="true"
+                 label="#{msg['common.credit-month-interest']}"
+                 value="#{cc.attrs.managedBean.interest}" tabindex="3">
+        <!--<f:convertNumber minIntegerDigits="1" maxIntegerDigits="5" maxFractionDigits="2"
+                         minFractionDigits="2"/>-->
+        <p:ajax listener="#{cc.attrs.managedBean.recalculate}" update="creditMessages_#{cc.attrs.uniqueIndex},
+        applicationFee_#{cc.attrs.uniqueIndex},realRate_#{cc.attrs.uniqueIndex}, gpr_#{cc.attrs.uniqueIndex},
+        endSum_#{cc.attrs.uniqueIndex}, calculationTable_#{cc.attrs.uniqueIndex}" event="keyup"/>
+    </p:inputText>
+    <h:outputText style="margin-left: 10px" value="%"/>
+</h:panelGroup>
+
+<h:outputText style="font-weight: bold;" value="#{msg['common.applicationFee']}"/>
+<h:panelGrid columns="2">
+    <p:inputText id="applicationFee_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.applicationFee}"
+                 tabindex="9">
+        <p:ajax listener="#{cc.attrs.managedBean.applicationFeeChangeListener}"
+                update="creditMessages_#{cc.attrs.uniqueIndex}, endSum_#{cc.attrs.uniqueIndex}, calculationTable_#{cc.attrs.uniqueIndex}"
+                event="keyup"/>
+    </p:inputText>
+    <h:outputText style="margin-left: 10px" value="#{cc.attrs.managedBean.defaultCurrency}."/>
+</h:panelGrid>
+
+
+<h:outputText id="personReferenceLabel_#{cc.attrs.uniqueIndex}" for="personReference_#{cc.attrs.uniqueIndex}"
+              value="#{msg['common.credit-owner']}" style="font-weight: bold"/>
+<h:panelGroup layout="block" style="float: left;">
+    <p:autoComplete id="personReference_#{cc.attrs.uniqueIndex}" required="true"
+                    cache="true" cacheTimeout="6000"
+                    label="#{msg['common.credit-owner']}" panelStyle="width:600px" queryDelay="1500"
+                    value="#{cc.attrs.managedBean.credit.person}" converter="#{personConverter}"
+                    validator="#{cc.attrs.managedBean.isUserDepricated}"
+                    completeMethod="#{autoComplete.autoCompletePerson}" maxResults="10" var="p"
+                    itemValue="#{p}" itemLabel="#{p.fullName}" dropdown="true" tabindex="4">
+
+        <p:ajax event="itemSelect"
+                update="@form:personRating_#{cc.attrs.uniqueIndex}, @form:agreement_#{cc.attrs.uniqueIndex}"
+                listener="#{cc.attrs.managedBean.onPersonSelect}"/>
+
+        <p:column headerText="#{msg['common.name']}">
+            #{p.name} #{p.midname} #{p.surname}
+        </p:column>
+
+        <p:column>
+            #{p.egn}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].city}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].street}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].number}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].entrance}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].floor}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].apartment}
+        </p:column>
+
+    </p:autoComplete>
+    <p:commandButton update="@form:personDetailsPanelGrid_#{cc.attrs.uniqueIndex}"
+                     oncomplete="PF('personDetailsDialog_#{uniqueIndex}').show()"
+                     icon="ui-icon-search" ajax="true"
+                     title="#{msg['common.detailCheck']}" immediate="true">
+        <f:setPropertyActionListener value="#{cc.attrs.managedBean.credit.person}"
+                                     target="#{cc.attrs.managedBean.selectedPerson}"/>
+    </p:commandButton>
+    <p:commandButton update="@form:agreement_#{cc.attrs.uniqueIndex}"
+                     oncomplete="PF('agreementDialog_#{uniqueIndex}').show()"
+                     icon="ui-icon-print"
+                     title="#{msg['common.printAggreement']}">
+    </p:commandButton>
+</h:panelGroup>
+
+<h:outputText value="#{msg['common.status']}" style="font-weight: bold"/>
+<p:rating id="personRating_#{uniqueIndex}" value="#{cc.attrs.managedBean.personRating}" stars="10" readonly="true">
+    <!--validatorMessage="#{msg['common.validateMessage.rating']}">-->
+    <!--<f:validateLongRange minimum="1"/>-->
+</p:rating>
+
+<h:outputText for="guarantor1Reference_#{cc.attrs.uniqueIndex}"
+              value="#{msg['common.first']} #{msg['common.credit-guarantor']}"
+              style="font-weight: bold"/>
+<h:panelGroup layout="block" style="float: left">
+    <p:autoComplete id="guarantor1Reference_#{cc.attrs.uniqueIndex}" required="false" tabindex="5"
+                    label="#{msg['common.first']} #{msg['common.credit-guarantor']}" panelStyle="width:600px"
+                    queryDelay="1500" cache="true" cacheTimeout="6000"
+                    value="#{cc.attrs.managedBean.credit.guarantor1}" converter="#{personConverter}"
+                    completeMethod="#{autoComplete.autoCompletePerson}" maxResults="10" var="p"
+                    itemValue="#{p}" itemLabel="#{p.fullName}" dropdown="true">
+
+        <p:ajax event="itemSelect" update="@form:guarantor1Rating_#{uniqueIndex}"/>
+
+        <p:column headerText="#{msg['common.name']}">
+            #{p.name} #{p.midname} #{p.surname}
+        </p:column>
+
+        <p:column>
+            #{p.egn}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].city}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].street}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].number}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].entrance}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].floor}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].apartment}
+        </p:column>
+    </p:autoComplete>
+    <p:commandButton update="@form:personDetailsPanelGrid_#{cc.attrs.uniqueIndex}"
+                     oncomplete="PF('personDetailsDialog_#{uniqueIndex}').show()"
+                     icon="ui-icon-search" ajax="true"
+                     title="#{msg['common.detailCheck']}" immediate="true">
+        <f:setPropertyActionListener value="#{cc.attrs.managedBean.credit.guarantor1}"
+                                     target="#{cc.attrs.managedBean.selectedPerson}"/>
+    </p:commandButton>
+    <!--<p:commandButton update="@form:display_#{uniqueIndex}"
+                     oncomplete="PF('aggreementDialog_#{uniqueIndex}').show()"
+                     icon="ui-icon-print" ajax="true"
+                     title="#{msg['common.printAggreement']}">
+        <f:setPropertyActionListener value="#{cc.attrs.managedBean.credit.guarantor1}"
+                                     target="#{cc.attrs.managedBean.selectedPerson}"/>
+    </p:commandButton>-->
+    <h:outputLabel/>
+</h:panelGroup>
+
+<h:outputText value="#{msg['common.status']}" style="font-weight: bold"/>
+<p:rating id="guarantor1Rating_#{uniqueIndex}" value="#{cc.attrs.managedBean.guarantor1Rating}" stars="10"
+          readonly="true"/>
+
+<h:outputText for="guarantor2Reference_#{cc.attrs.uniqueIndex}"
+              value="#{msg['common.second']} #{msg['common.credit-guarantor']}"
+              style="font-weight: bold"/>
+<h:panelGroup layout="block" style="float: left">
+    <p:autoComplete id="guarantor2Reference_#{cc.attrs.uniqueIndex}" required="false" tabindex="6"
+                    label="#{msg['common.second']} #{msg['common.credit-guarantor']}" panelStyle="width:600px"
+                    queryDelay="1500" cache="true" cacheTimeout="6000"
+                    value="#{cc.attrs.managedBean.credit.guarantor2}" converter="#{personConverter}"
+                    completeMethod="#{autoComplete.autoCompletePerson}" maxResults="10" var="p"
+                    itemValue="#{p}" itemLabel="#{p.fullName}" dropdown="true">
+
+        <p:ajax event="itemSelect"
+                update="@form:guarantor2Rating_#{cc.attrs.uniqueIndex}"/>
+
+        <p:column headerText="#{msg['common.name']}">
+            #{p.name} #{p.midname} #{p.surname}
+        </p:column>
+
+        <p:column>
+            #{p.egn}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].city}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].street}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].number}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].entrance}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].floor}
+        </p:column>
+
+        <p:column>
+            #{p.addresses[0].apartment}
+        </p:column>
+    </p:autoComplete>
+    <p:commandButton update="@form:personDetailsPanelGrid_#{cc.attrs.uniqueIndex}"
+                     oncomplete="PF('personDetailsDialog_#{uniqueIndex}').show()"
+                     icon="ui-icon-search" ajax="true"
+                     title="#{msg['common.detailCheck']}">
+        <f:setPropertyActionListener value="#{cc.attrs.managedBean.credit.guarantor2}"
+                                     target="#{cc.attrs.managedBean.selectedPerson}"/>
+    </p:commandButton>
+    <!--<p:commandButton update="@form:display_#{uniqueIndex}"
+                     oncomplete="PF('aggreementDialog_#{uniqueIndex}').show()"
+                     icon="ui-icon-print" ajax="true"
+                     title="#{msg['common.printAggreement']}">
+        <f:setPropertyActionListener value="#{cc.attrs.managedBean.credit.guarantor2}"
+                                     target="#{cc.attrs.managedBean.selectedPerson}"/>
+    </p:commandButton>-->
+    <h:outputLabel/>
+</h:panelGroup>
+
+<h:outputText value="#{msg['common.status']}" style="font-weight: bold"/>
+<p:rating id="guarantor2Rating_#{uniqueIndex}" value="#{cc.attrs.managedBean.guarantor2Rating}" stars="10"
+          readonly="true"/>
+
+<!--<h:outputText style="font-weight: bold;" value="IRR: "/>
+<p:inputText id="irr_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.irr}"
+             immediate="true" disabled="true">
+    <f:convertNumber type="percent" minIntegerDigits="1" maxIntegerDigits="5" maxFractionDigits="2"
+                     minFractionDigits="2"/>
+</p:inputText>-->
+<h:outputText value="#{msg['common.credit-location']}" style="font-weight: bold"/>
+<p:autoComplete id="offices_#{cc.attrs.uniqueIndex}" required="true" disabled="true"
+                label="#{msg['common.menu.office']}" panelStyle="width:400px"
+                queryDelay="500" cache="true" cacheTimeout="6000"
+                value="#{cc.attrs.managedBean.currentOffice}" converter="#{officeConverter}"
+                completeMethod="#{autoComplete.autoCompleteOffices}" maxResults="10" var="o"
+                itemValue="#{o}" itemLabel="#{o.name}">
+
+    <p:column headerText="#{msg['common.name']}">
+        #{o.name}
+    </p:column>
+
+    <p:column headerText="#{msg['common.menu.region']}">
+        #{o.region.name}
+    </p:column>
+</p:autoComplete>
+
+<h:outputText style="font-weight: bold;" value="GPR: "/>
+<p:inputText id="gpr_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.gpr}"
+             immediate="true" disabled="true">
+    <f:convertNumber type="percent" minIntegerDigits="1" maxIntegerDigits="5" maxFractionDigits="2"
+                     minFractionDigits="2"/>
+    <f:validateDoubleRange maximum="0.50"/>
+</p:inputText>
+
+<h:outputText style="font-weight: bold;" value="Real rate: "/>
+<p:inputText id="realRate_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.credit.interest}"
+             immediate="true" disabled="true">
+    <f:convertNumber type="percent" minIntegerDigits="1" maxIntegerDigits="5" maxFractionDigits="2"
+                     minFractionDigits="2"/>
+</p:inputText>
+
+<h:outputText style="font-weight: bold;" value="#{msg['common.endSum']}:"/>
+<p:inputText id="endSum_#{cc.attrs.uniqueIndex}" disabled="true"
+             value="#{cc.attrs.managedBean.credit.fullSum} #{cc.attrs.managedBean.credit.currency}"/>
+
+</h:panelGrid>
+
+<p:dataTable id="calculationTable_#{cc.attrs.uniqueIndex}" var="payment" style="width: 50%!important;"
+             value="#{cc.attrs.managedBean.credit.payments}" editable="true" editMode="cell"
+             widgetVar="calculationTable_#{cc.attrs.uniqueIndex}" rowIndexVar="rowId">
+
+    <f:facet name="header">
+        #{msg['common.payments']}
+    </f:facet>
+
+    <p:column headerText="№" style="width: 15px">
+        #{rowId+1}
+    </p:column>
+
+    <p:column headerText="#{msg['common.date']}">
+        <p:cellEditor>
+            <f:facet name="output">
+                <h:outputText value="#{payment.dueDate.toString('dd/MM/yyyy')}"/>
+            </f:facet>
+            <f:facet name="input">
+                <p:calendar value="#{payment.dueDate}" pattern="dd/MM/yyyy"
+                            showButtonPanel="true" navigator="true"
+                            mode="popup" showOn="button" popupIconOnly="true"
+                            converter="dateConverter" mindate="#{cc.attrs.managedBean.today}">
+                    <p:ajax event="dateSelect" update="calculationTable_#{cc.attrs.uniqueIndex}"/>
+                </p:calendar>
+            </f:facet>
+        </p:cellEditor>
+    </p:column>
+
+    <p:column headerText="#{msg['common.basis']}">
+        <p:cellEditor>
+            <f:facet name="output">
+                <h:outputText value="#{payment.basis}"/>
+            </f:facet>
+            <f:facet name="input">
+                <h:outputText value="#{payment.basis}"/>
+            </f:facet>
+        </p:cellEditor>
+    </p:column>
+
+    <p:column headerText="#{msg['common.interest']}">
+        <p:cellEditor>
+            <f:facet name="output">
+                <h:outputText value="#{payment.interest}"/>
+            </f:facet>
+            <f:facet name="input">
+                <h:outputText value="#{payment.interest}"/>
+            </f:facet>
+        </p:cellEditor>
+    </p:column>
+
+    <p:column headerText="#{msg['common.insurance']}">
+        <p:cellEditor>
+            <f:facet name="output">
+                <h:outputText value="#{payment.insurance}"/>
+            </f:facet>
+            <f:facet name="input">
+                <h:outputText value="#{payment.insurance}"/>
+            </f:facet>
+        </p:cellEditor>
+    </p:column>
+
+    <p:column headerText="#{msg['common.sum']}">
+        <h:outputText value="#{payment.sum}"/>
+    </p:column>
+
+    <p:columnGroup type="footer">
+        <p:row>
+            <p:column colspan="4" footerText="Totals:"
+                      style="text-align:right"/>
+            <p:column
+                    footerText="#{cc.attrs.managedBean.credit.insurance.sum} #{cc.attrs.managedBean.credit.currency}"/>
+            <p:column
+                    footerText="#{cc.attrs.managedBean.credit.fullSum} #{cc.attrs.managedBean.credit.currency}"/>
+        </p:row>
+    </p:columnGroup>
+
+    <p:ajax event="cellEdit" update="@this"/>
+</p:dataTable>
+
+<p:dialog id="personDetailsDialog_#{cc.attrs.uniqueIndex}" header="#{msg['common.details']}"
+          widgetVar="personDetailsDialog_#{cc.attrs.uniqueIndex}" maximizable="true" minimizable="true"
+          resizable="true" showEffect="fade" hideEffect="explode" style="width: auto; height: auto" closeOnEscape="true"
+          dynamic="true">
+
+    <h:panelGroup layout="block" id="personDetailsPanelGrid_#{cc.attrs.uniqueIndex}"
+                  style="width: 1000px; height: 600px">
+        <components:PersonDetailViewComponent uniqueIndex="#{cc.attrs.uniqueIndex}"
+                                              person="#{cc.attrs.managedBean.selectedPerson}"
+                                              managedBean="#{cc.attrs.managedBean}"/>
+    </h:panelGroup>
+</p:dialog>
+
+<p:dialog header="#{msg['common.aggreement']}" widgetVar="agreementDialog_#{cc.attrs.uniqueIndex}" resizable="true"
+          showEffect="fade" hideEffect="explode" style="width: auto; height: auto" closeOnEscape="true"
+          onHide="PF('confirmPrintRecipt5').show()">
+
+    <p:confirmDialog global="true" showEffect="fade" hideEffect="explode" widgetVar="confirmPrintRecipt5"
+                     message="#{msg['common.question.printFee4Agreement']}">
+        <p:commandButton value="#{msg['common.yes']}" type="button" styleClass="ui-confirmdialog-yes"
+                         icon="ui-icon-check">
+            <!--<p:ajax listener="#{cc.attrs.managedBean.printFee4Agreement}" oncomplete="resetTab()"/>-->
+        </p:commandButton>
+        <p:commandButton value="#{msg['common.no']}" type="button" styleClass="ui-confirmdialog-no"
+                         icon="ui-icon-close"/>
+    </p:confirmDialog>
+
+    <h:panelGrid id="agreement_#{cc.attrs.uniqueIndex}" columns="2" cellpadding="4" style="margin:0 auto;">
+
+        <f:facet name="header">
+            #{msg['common.aggreement']}
+        </f:facet>
+
+        <h:panelGrid columns="1" style="width: 100%; margin-top: 10px">
+            <p:editor id="aggreementEditor_#{cc.attrs.uniqueIndex}" widgetVar="agreementEditor_#{cc.attrs.uniqueIndex}"
+                      width="800" height="600"
+                      value="#{cc.attrs.managedBean.agreementDocument.source}"/>
+        </h:panelGrid>
+
+    </h:panelGrid>
+
+</p:dialog>
+
+
+<!--<p:confirmDialog header="#{msg['common.confirmation']}" widgetVar="saveDialog_#{cc.attrs.uniqueIndex}" resizable="false"
+                 showEffect="fade" hideEffect="explode" style="width: auto; height: auto" closeOnEscape="true">
+    <p:outputLabel value="#{msg['common.areyousure_Save']}"/>
+    <h:panelGrid columns="2">
+        <p:commandButton widgetVar="saveCreditConfirm_#{cc.attrs.uniqueIndex}" value="#{msg['common.yes']}"
+                         actionListener="#{cc.attrs.managedBean.save}" update="@form"/>
+        <p:commandButton value="#{msg['common.no']}" update="@form"/>
+    </h:panelGrid>
+</p:confirmDialog>-->
+
+<!--<p:commandButton value="Save with success" process="masterDetail"
+                 action="#{cc.attrs.managedBean.save}"
+                 style="margin-top:10px;" icon="ui-icon-disk">
+    <pe:selectDetailLevel level="2"/>
+</p:commandButton>-->
+
+</pe:masterDetailLevel>
+
+<pe:masterDetailLevel id="documentsTab_#{cc.attrs.uniqueIndex}" level="2" levelLabel="#{msg['common.documents']}">
+
+    <p:tabView id="tabView_#{cc.attrs.uniqueIndex}" dynamic="true" scrollable="true" style="width: 100%; height: 100%"
+               activeIndex="#{cc.attrs.managedBean.documentsTabActiveIndex}">
+
+        <!--<p:ajax event="tabChange" update="@this"/>-->
+
+        <c:forEach items="#{cc.attrs.managedBean.documents}" var="document">
+            <p:tab title="#{document.value.document.name}"
+                   style="width: 100%; height: 100%">
+                <p:commandButton value="Print" type="button" icon="ui-icon-print"
+                                 onclick="printEditorContent('#{document.value.uicomponent.clientId}')"
+                                 style="display:block;margin-bottom: 20px">
+                    <!--<p:printer
+                            target="editor_#{document.key}_#{cc.attrs.managedBean.documentsTabActiveIndex}_#{cc.attrs.uniqueIndex}"/>-->
+                </p:commandButton>
+                <p:editor width="780" height="550" value="#{document.value.document.source}"
+                          widgetVar="docEditor" binding="#{document.value.uicomponent}"
+                          id="editor_#{document.key}_#{cc.attrs.managedBean.documentsTabActiveIndex}_#{cc.attrs.uniqueIndex}"/>
+            </p:tab>
+        </c:forEach>
+        <!--<p:tab title="#{msg['common.aggreement']}" style="width: 100%; height: 100%">
+            <p:editor width="780" height="550" id="editorContractAggrement_#{cc.attrs.uniqueIndex}"
+                      value="#{cc.attrs.managedBean.agreementDocument.source}"/>
+        </p:tab>
+
+        <p:tab title="#{msg['common.contract']}" style="width: 100%; height: 100%">
+            <c:choose>
+                <c:when test="#{cc.attrs.managedBean.credit.period == 1}">
+                    <p:editor width="780" height="550" id="editorContract_#{cc.attrs.uniqueIndex}"
+                              value="#{cc.attrs.managedBean.contractDocument1.source}"/>
+                </c:when>
+                <c:otherwise>
+                    <p:editor width="780" height="550" id="editorContract_#{cc.attrs.uniqueIndex}"
+                              value="#{cc.attrs.managedBean.contractDocument2.source}"/>
+                </c:otherwise>
+            </c:choose>
+        </p:tab>
+
+        <p:tab title="#{msg['common.appendix']} 1" style="width: 100%; height: 100%">
+            <p:editor width="780" height="550" id="contractDocumentAppendix1_#{cc.attrs.uniqueIndex}"
+                      value="#{cc.attrs.managedBean.contractAppendix1Document.source}"/>
+        </p:tab>
+
+
+        <p:tab title="#{msg['common.contractGuarantor1']}" style="width: 100%; height: 100%"
+               rendered="#{cc.attrs.managedBean.hasGuarantor1}">
+            <p:editor width="780" height="550" id="editorContractGuarantor1_#{cc.attrs.uniqueIndex}"
+                      value="#{cc.attrs.managedBean.contractGuarantor1Document.source}"/>
+        </p:tab>
+
+        <p:tab title="#{msg['common.contractGuarantor2']}" style="width: 100%; height: 100%"
+               rendered="#{cc.attrs.managedBean.hasGuarantor2}">
+            <p:editor width="780" height="550" id="editorcontractGuarantor2_#{cc.attrs.uniqueIndex}"
+                      value="#{cc.attrs.managedBean.contractGuarantor2Document.source}"/>
+        </p:tab>
+        <p:tab title="#{msg['common.outcomeOrder']}" style="width: 100%; height: 100%">
+            <p:editor width="780" height="550" id="outcomeOrder_#{cc.attrs.uniqueIndex}"
+                      value="#{cc.attrs.managedBean.outcomeOrderDocument.source}"/>
+        </p:tab>
+        <p:tab title="#{msg['common.insuranceNote']}" style="width: 100%; height: 100%">
+            <p:editor width="780" height="550" id="insuranceNote_#{cc.attrs.uniqueIndex}"
+                      value="#{cc.attrs.managedBean.insuranceNoteDocument.source}"/>
+        </p:tab>
+        <p:tab title="#{msg['common.rules']}" style="width: 100%; height: 100%">
+            <p:editor width="780" height="550" id="appendix2_#{cc.attrs.uniqueIndex}"
+                      value="#{cc.attrs.managedBean.contractAppendix2Document.source}"/>
+        </p:tab>-->
+    </p:tabView>
+</pe:masterDetailLevel>
+
+<!--<p:tab title="#{msg['common.finish']}">
+<p:toolbar>
+    <p:toolbarGroup align="left">
+        <p:commandButton title="#{msg['common.menu.save']}" icon="ui-icon-disk"
+                         actionListener="#{cc.attrs.managedBean.save}" update="@form" oncomplete="resetWizard()"/>
+        <p:separator/>
+        <p:commandButton title="#{msg['common.print']}" icon="ui-icon-print">
+            <p:printer target="summaryPG"/>
+        </p:commandButton>
+    </p:toolbarGroup>
+
+</p:toolbar>
+<h:panelGrid id="summaryPG" columns="1" columnClasses="label, value"
+             styleClass="grid">
+
+    <h:panelGrid columns="4" columnClasses="label, value"
+                 styleClass="grid">
+
+        <p:outputLabel value="#{msg['common.id']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.credit.id}"/>
+
+        <p:outputLabel value="#{msg['common.applicationFee']}" style="font-weight: bold"/>
+        <h:panelGrid styleClass="grid" columns="2">
+            <p:outputLabel value="#{cc.attrs.managedBean.credit.applicationFee} лв. "/>
+            <p:commandButton value="#{msg['common.printReciptApplicationFee']}" icon="ui-icon-print"
+                             action="#{cc.attrs.managedBean.printApplicationFee}">
+                &lt;!&ndash;<p:ajax listener="#{cc.attrs.managedBean.printApplicationFee}" event=""/>&ndash;&gt;
+            </p:commandButton>
+        </h:panelGrid>
+
+        <p:outputLabel value="#{msg['common.credit-sum']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.credit.basis} #{cc.attrs.managedBean.creditCurrency}"/>
+
+        <p:outputLabel value="GPR" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.credit.gpr}"/>
+
+        <p:outputLabel value="#{msg['common.credit-time']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.credit.period} #{cc.attrs.managedBean.periodWord}"/>
+
+        <p:outputLabel/>
+        <p:outputLabel/>
+
+        <p:outputLabel value="#{msg['common.credit-month-interest']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.creditPercent} %"/>
+
+        <p:outputLabel/>
+        <p:outputLabel/>
+
+        <p:outputLabel value="#{msg['common.credit-insurance-value']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.insuranceValue} #{cc.attrs.managedBean.credit.currency}"/>
+
+        <p:outputLabel/>
+        <p:outputLabel/>
+
+        <p:outputLabel value="#{msg['common.endSum']}" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.credit.fullSum} #{cc.attrs.managedBean.credit.currency}"/>
+    </h:panelGrid>
+
+    <p:dataTable id="calculationSummaryTable_#{cc.attrs.uniqueIndex}" var="payment"
+                 value="#{cc.attrs.managedBean.credit.payments}" editable="true" editMode="cell"
+                 widgetVar="calculationSummaryTable_#{cc.attrs.uniqueIndex}" style="width: 50%">
+
+        <f:facet name="header">
+            #{msg['common.payments']}
+        </f:facet>
+
+        <p:column headerText="#{msg['common.date']}">
+            <h:outputText value="#{payment.dueDate.toString('dd/MM/yyyy')}"/>
+        </p:column>
+
+        <p:column headerText="#{msg['common.basis']}">
+            <h:outputText value="#{payment.basis}"/>
+        </p:column>
+
+        <p:column headerText="#{msg['common.interest']}">
+            <h:outputText value="#{payment.interest}"/>
+        </p:column>
+
+        <p:column headerText="#{msg['common.insurance']}">
+            <h:outputText value="#{payment.insurance}"/>
+        </p:column>
+
+        <p:column headerText="#{msg['common.sum']}">
+            <h:outputText value="#{payment.sum}"/>
+        </p:column>
+
+        <p:columnGroup type="footer">
+            <p:row>
+                <p:column colspan="4" footerText="Totals:"
+                          style="text-align:right"/>
+
+                <p:column
+                        footerText="#{cc.attrs.managedBean.credit.fullSum} #{cc.attrs.managedBean.credit.currency} "/>
+            </p:row>
+        </p:columnGroup>
+
+        <p:ajax event="cellEdit" update="@this"/>
+    </p:dataTable>
+
+
+    <h:panelGrid columns="2" columnClasses="label, value"
+                 styleClass="grid">
+        <p:outputLabel value="#{msg['common.menu.customer']}:" style="font-weight: bold"/>
+        <p:outputLabel
+                value="#{cc.attrs.managedBean.credit.person.name} #{cc.attrs.managedBean.credit.person.midname} #{cc.attrs.managedBean.credit.person.surname}"/>
+        <p:outputLabel value="#{msg['common.egn']}:" style="font-weight: bold"/>
+        <p:outputLabel
+                value="#{cc.attrs.managedBean.credit.person.egn}"/>
+        <p:outputLabel value="#{msg['common.contact.lkno']}:" style="font-weight: bold"/>
+        <p:outputLabel
+                value="#{cc.attrs.managedBean.credit.person.lkNo}"/>
+        <c:forEach items="#{cc.attrs.managedBean.credit.person.addresses}" var="address">
+            <p:outputLabel value="#{msg['common.menu.address']}:" style="font-weight: bold"/>
+            <p:outputLabel value="#{address}"/>
+        </c:forEach>
+        <c:forEach items="#{cc.attrs.managedBean.credit.person.phones}" var="phone">
+            <p:outputLabel value="#{msg['common.contacts.phone']}:" style="font-weight: bold"/>
+            <p:outputLabel value="#{phone}"/>
+        </c:forEach>
+    </h:panelGrid>
+
+    <c:if test="${cc.attrs.managedBean.credit.guarantor1.id > 0}">
+        <h:panelGrid columns="2" columnClasses="label, value"
+                     styleClass="grid">
+            <p:outputLabel value="#{msg['common.credit-guarantor']}:" style="font-weight: bold"/>
+            <p:outputLabel
+                    value="#{cc.attrs.managedBean.credit.guarantor1.name} #{cc.attrs.managedBean.credit.guarantor1.midname} #{cc.attrs.managedBean.credit.guarantor1.surname}"/>
+            <p:outputLabel value="#{msg['common.egn']}:" style="font-weight: bold"/>
+            <p:outputLabel
+                    value="#{cc.attrs.managedBean.credit.guarantor1.egn}"/>
+            <p:outputLabel value="#{msg['common.contact.lkno']}:" style="font-weight: bold"/>
+            <p:outputLabel
+                    value="#{cc.attrs.managedBean.credit.guarantor1.lkNo}"/>
+            <c:forEach items="#{cc.attrs.managedBean.credit.guarantor1.addresses}" var="address">
+                <p:outputLabel value="#{msg['common.menu.address']}:" style="font-weight: bold"/>
+                <p:outputLabel value="#{address}"/>
+            </c:forEach>
+            <c:forEach items="#{cc.attrs.managedBean.credit.guarantor1.phones}" var="phone">
+                <p:outputLabel value="#{msg['common.contacts.phone']}:" style="font-weight: bold"/>
+                <p:outputLabel value="#{phone}"/>
+            </c:forEach>
+        </h:panelGrid>
+    </c:if>
+
+    <c:if test="${cc.attrs.managedBean.credit.guarantor2.id > 0}">
+        <h:panelGrid columns="2" columnClasses="label, value"
+                     styleClass="grid">
+            <p:outputLabel value="#{msg['common.credit-guarantor']}:" style="font-weight: bold"/>
+            <p:outputLabel
+                    value="#{cc.attrs.managedBean.credit.guarantor2.name} #{cc.attrs.managedBean.credit.guarantor2.midname} #{cc.attrs.managedBean.credit.guarantor2.surname}"/>
+            <p:outputLabel value="#{msg['common.egn']}:" style="font-weight: bold"/>
+            <p:outputLabel
+                    value="#{cc.attrs.managedBean.credit.guarantor2.egn}"/>
+            <p:outputLabel value="#{msg['common.contact.lkno']}:" style="font-weight: bold"/>
+            <p:outputLabel
+                    value="#{cc.attrs.managedBean.credit.guarantor2.lkNo}"/>
+            <c:forEach items="#{cc.attrs.managedBean.credit.guarantor2.addresses}" var="address">
+                <p:outputLabel value="#{msg['common.menu.address']}:" style="font-weight: bold"/>
+                <p:outputLabel value="#{address}"/>
+            </c:forEach>
+            <c:forEach items="#{cc.attrs.managedBean.credit.guarantor2.phones}" var="phone">
+                <p:outputLabel value="#{msg['common.contacts.phone']}:" style="font-weight: bold"/>
+                <p:outputLabel value="#{phone}"/>
+            </c:forEach>
+        </h:panelGrid>
+    </c:if>
+
+    <p:outputLabel value="#{msg['common.documents']}:" style="font-weight: bold"/>
+    <h:panelGrid columns="2" columnClasses="label, value"
+                 styleClass="grid">
+
+        <c:if test="${cc.attrs.managedBean.credit.guarantor1.id > 0}">
+            <p:outputLabel value="#{msg['common.documents.guarantor1-contract']}:" style="font-weight: bold"/>
+            <p:outputLabel value="#{cc.attrs.managedBean.contractGuarantor1Document.id}"/>
+        </c:if>
+
+        <c:if test="${cc.attrs.managedBean.credit.guarantor2.id > 0}">
+            <p:outputLabel value="#{msg['common.documents.guarantor2-contract']}:" style="font-weight: bold"/>
+            <p:outputLabel value="#{cc.attrs.managedBean.contractGuarantor2Document.id}"/>
+        </c:if>
+
+        <p:outputLabel value="#{msg['common.credit.issuedFrom']}:" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.currentUser.username}"/>
+        <p:outputLabel value="#{msg['common.credit.issuedIn']}:" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.currentOffice.name}"/>
+        <p:outputLabel value="#{msg['common.credit.issuedAt']}:" style="font-weight: bold"/>
+        <p:outputLabel value="#{cc.attrs.managedBean.currentDateTime}"/>
+    </h:panelGrid>
+
+    <p:fieldset legend="#{msg['common.documents']}" style="margin-top: 10px; !important">
+        <h:panelGrid columns="2" columnClasses="label, value"
+                     styleClass="grid">
+            <c:forEach items="#{cc.attrs.managedBean.documents}" var="document">
+                <p:outputLabel value="#{msg['common.id']}:" style="font-weight: bold"/>
+                <p:outputLabel value="#{document.id}"/>
+                <p:outputLabel value="#{msg['common.name']}:" style="font-weight: bold"/>
+                <p:outputLabel value="#{document.name}"/>
+                <p:outputLabel/>
+                <p:commandButton icon="ui-icon-print"
+                                 actionListener="#{cc.attrs.managedBean.printDocument(document)}"
+                                 oncomplete="PF('documentPrintDialog').show()"
+                                 value="#{msg['common.print']}" ajax="true" process="@this"
+                                 update="@form:displayDocumentPanelGrid_#{cc.attrs.uniqueIndex}">
+                </p:commandButton>
+                <p:outputLabel value="#{msg['common.location']}:" style="font-weight: bold"/>
+                <p:outputLabel value="#{document.location.name}"/>
+            </c:forEach>
+        </h:panelGrid>
+    </p:fieldset>
+
+    <p:commandButton title="#{msg['common.menu.save']}" icon="ui-icon-disk" value="#{msg['common.menu.save']}"
+                     actionListener="#{cc.attrs.managedBean.save}" update="@form" oncomplete="resetWizard()"/>
+</h:panelGrid>
+
+<p:toolbar>
+    <f:facet name="left">
+        <p:commandButton title="#{msg['common.menu.save']}" icon="ui-icon-disk"
+                         value="#{msg['common.menu.save']}"
+                         actionListener="#{cc.attrs.managedBean.save}" update="@form">
+            <p:confirm header="#{msg['common.confirmation']}" message="#{msg['common.areyousure_Save']}"
+                       icon="ui-icon-alert"/>
+        </p:commandButton>
+        <p:separator/>
+        <p:commandButton icon="ui-icon-closethick" title="#{msg['common.decline']}"
+                         actionListener="#{cc.attrs.managedBean.decline}">
+            <p:confirm header="#{msg['common.confirmation']}" message="#{msg['common.declineQuestion']}"
+                       icon="ui-icon-alert"/>
+        </p:commandButton>
+        <p:separator/>
+        <p:commandButton type="button" title="#{msg['common.print']}" icon="ui-icon-print"/>
+    </f:facet>
+</p:toolbar>
+</p:tab>-->
+
+</pe:masterDetail>
+
+<p:dialog id="displayDocumentDialog_#{cc.attrs.uniqueIndex}" header="#{msg['common.documentBlank']}"
+          widgetVar="documentPrintDialog"
+          resizable="true"
+          showEffect="fade" hideEffect="explode" style="width: auto; height: auto" closeOnEscape="true">
+    <h:panelGrid id="displayDocumentPanelGrid_#{cc.attrs.uniqueIndex}" columns="2" cellpadding="4"
+                 style="margin:0 auto;">
+
+        <p:editor id="templateSourceEditor_#{cc.attrs.uniqueIndex}" widgetVar="ttsEditor" width="800" height="500"
+                  value="#{cc.attrs.managedBean.selectedDocument.source}"/>
+
+    </h:panelGrid>
+</p:dialog>
+
+</h:form>
+</composite:implementation>
+
+</ui:component>

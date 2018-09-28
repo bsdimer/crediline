@@ -1,0 +1,30 @@
+<jnlp href="main.jnlp" encoding="UTF-8">
+    <information>
+        <title>File Downloader Applet</title>
+        <vendor>Crediline PLC</vendor>
+
+        <association extensions="jnlp" mime-type="application/x-java-jnlp-file"/>
+        <!--<association extensions="%file.extension%" mime-type="%file.content-type%"/>-->
+        <shortcut online='false'>
+            <desktop/>
+        </shortcut>
+    </information>
+
+    <security>
+        <all-permissions/>
+    </security>
+
+    <update check="always" policy="always"/>
+
+    <resources os="Windows" arch="x86">
+        <!--<property name='jnlp.file.extension' value="%file.extension%"/>-->
+        <property name='jnlp.file.extension' value="jnlp"/>
+        <j2se href="http://java.sun.com/products/autodl/j2se" version="1.6+"/>
+        <jar href="file-downloader-applet-1.0-RELEASE.jar" main="true"/>
+    </resources>
+
+    <applet-desc
+            name="File Downloader Applet"
+            main-class="com.crediline.applet.FileDownloaderApplet" width="1" height="1">
+    </applet-desc>
+</jnlp>

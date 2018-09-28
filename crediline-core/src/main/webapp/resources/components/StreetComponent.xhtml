@@ -1,0 +1,46 @@
+<ui:component xmlns=""
+              xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:c="http://java.sun.com/jsp/jstl/core"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <composite:interface>
+        <composite:attribute name="managedBean" required="true" type="com.crediline.mb.StreetMB"/>
+        <composite:attribute name="uniqueIndex" required="true"/>
+    </composite:interface>
+
+    <composite:implementation>
+        <h:panelGroup layout="block" style="float: left; padding: 10px; width: 100%">
+
+            <h:form id="mainContactsForm_#{cc.attrs.uniqueIndex}">
+                <p:focus for="streetName_#{cc.attrs.uniqueIndex}"/>
+                <p:growl id="growl_#{cc.attrs.uniqueIndex}" showDetail="true" sticky="true"/>
+                <p:messages id="messages_#{cc.attrs.uniqueIndex}" showDetail="true"/>
+
+                <p:toolbar style="width: 96%; margin-bottom: 20px">
+                    <f:facet name="left">
+                        <p:commandButton title="#{msg['common.menu.save']}" icon="ui-icon-disk"
+                                         value="#{msg['common.menu.save']}"
+                                         actionListener="#{cc.attrs.managedBean.saveAndClose}" update="@form">
+                            <p:confirm header="#{msg['common.confirmation']}" message="#{msg['common.areyousure_Save']}"
+                                       icon="ui-icon-alert"/>
+                        </p:commandButton>
+                        <p:separator/>
+                    </f:facet>
+                </p:toolbar>
+
+                <p:outputLabel for="streetName_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.streetName']}" style="margin-right: 10px"/>
+                <p:inputText id="streetName_#{cc.attrs.uniqueIndex}" required="true"
+                             style="width: 120px"
+                             label="#{msg['common.streetName']}"
+                             value="#{cc.attrs.managedBean.street.name}">
+                </p:inputText>
+
+            </h:form>
+        </h:panelGroup>
+    </composite:implementation>
+
+</ui:component>

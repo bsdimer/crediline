@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+	
+	<p:dataTable id="creditRegisterReportTable_#{cc.attrs.uniqueIndex}" var="data"
+		scrollable="true" scrollHeight="#{cc.attrs.managedBean.isBigData() ? 250 : 100}"
+		value="#{cc.attrs.managedBean.registerData}"
+		styleClass="credit-register-table" lazy="true" liveScroll="true" scrollRows="30">
+	
+		<p:column style="width:50px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.common.DATE']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_DATE}" />
+		</p:column>
+		
+		<p:column style="width:80px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.common.BAE']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_BAE}" />
+		</p:column>
+		
+		<p:column style="width:40px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.common.REC']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_REC}" />
+		</p:column>
+	
+		<p:column style="width:80px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.credit.state.CUCR_CRED']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_CRED}" />
+		</p:column>
+		
+		<p:column style="width:95px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.credit.state.CUCR_BORR']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_BORR}" />
+		</p:column>
+		
+		<p:column style="width:50px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.credit.state.CUCR_CATG']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_CATG}" />
+		</p:column>
+		
+		<p:column style="width:60px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.credit.state.CUCR_SUMA']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_SUMA}" />
+		</p:column>
+		
+		<p:column style="width:60px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.credit.state.CUCR_PRINC']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_PRINC}" />
+		</p:column>
+		
+<!-- 		<p:column> -->
+<!-- 			<f:facet name="header"> -->
+<!-- 				<h:outputText value="#{msg['register.table.credit.state.CUCR_PRINC_OVER']}" /> -->
+<!-- 			</f:facet> -->
+<!-- 			<h:outputText value="#{data.CUCR_PRINC_OVER}" /> -->
+<!-- 		</p:column> -->
+		
+		<p:column style="width:70px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.credit.state.CUCR_OVER_INTER']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_OVER_INTER}" />
+		</p:column>
+		
+<!-- 		<p:column> -->
+<!-- 			<f:facet name="header"> -->
+<!-- 				<h:outputText value="#{msg['register.table.credit.state.CUCR_JUD_DUES']}" /> -->
+<!-- 			</f:facet> -->
+<!-- 			<h:outputText value="#{data.CUCR_JUD_DUES}" /> -->
+<!-- 		</p:column> -->
+		
+<!-- 		<p:column> -->
+<!-- 			<f:facet name="header"> -->
+<!-- 				<h:outputText value="#{msg['register.table.credit.state.CUCR_COND_BAL']}" /> -->
+<!-- 			</f:facet> -->
+<!-- 			<h:outputText value="#{data.CUCR_COND_BAL}" /> -->
+<!-- 		</p:column> -->
+		
+		<p:column style="width:60px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.credit.state.CUCR_TOT_BALANS']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_TOT_BALANS}" />
+		</p:column>
+		
+		<p:column style="width:60px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.credit.state.CUCR_DEVAL']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_DEVAL}" />
+		</p:column>
+		
+<!-- 		<p:column> -->
+<!-- 			<f:facet name="header"> -->
+<!-- 				<h:outputText value="#{msg['register.table.credit.state.CUCR_OFFBAL_DUES']}" /> -->
+<!-- 			</f:facet> -->
+<!-- 			<h:outputText value="#{data.CUCR_OFFBAL_DUES}" /> -->
+<!-- 		</p:column> -->
+		
+<!-- 		<p:column> -->
+<!-- 			<f:facet name="header"> -->
+<!-- 				<h:outputText value="#{msg['register.table.credit.state.CUCR_COND_OFF']}" /> -->
+<!-- 			</f:facet> -->
+<!-- 			<h:outputText value="#{data.CUCR_COND_OFF}" /> -->
+<!-- 		</p:column> -->
+		
+<!-- 		<p:column> -->
+<!-- 			<f:facet name="header"> -->
+<!-- 				<h:outputText value="#{msg['register.table.credit.state.CUCR_OVER_OFF']}" /> -->
+<!-- 			</f:facet> -->
+<!-- 			<h:outputText value="#{data.CUCR_OVER_OFF}" /> -->
+<!-- 		</p:column> -->
+		
+<!-- 		<p:column> -->
+<!-- 			<f:facet name="header"> -->
+<!-- 				<h:outputText value="#{msg['register.table.credit.state.CUCR_TOT_OFFBAL']}" /> -->
+<!-- 			</f:facet> -->
+<!-- 			<h:outputText value="#{data.CUCR_TOT_OFFBAL}" /> -->
+<!-- 		</p:column> -->
+		
+		<p:column style="width:60px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.credit.state.CUCR_DEVAL_REASON']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_DEVAL_REASON}" />
+		</p:column>
+		
+<!-- 		<p:column> -->
+<!-- 			<f:facet name="header"> -->
+<!-- 				<h:outputText value="#{msg['register.table.credit.state.CUCR_EXP_NOM']}" /> -->
+<!-- 			</f:facet> -->
+<!-- 			<h:outputText value="#{data.CUCR_EXP_NOM}" /> -->
+<!-- 		</p:column> -->
+		
+		<p:column style="width:50px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.credit.state.CUCR_INTR']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_INTR}" />
+		</p:column>
+		
+<!-- 		<p:column> -->
+<!-- 			<f:facet name="header"> -->
+<!-- 				<h:outputText value="#{msg['register.table.credit.state.CUCR_PROV_RISK']}" /> -->
+<!-- 			</f:facet> -->
+<!-- 			<h:outputText value="#{data.CUCR_PROV_RISK}" /> -->
+<!-- 		</p:column> -->
+		
+<!-- 		<p:column> -->
+<!-- 			<f:facet name="header"> -->
+<!-- 				<h:outputText value="#{msg['register.table.credit.state.CUCR_PROV_MSS']}" /> -->
+<!-- 			</f:facet> -->
+<!-- 			<h:outputText value="#{data.CUCR_PROV_MSS}" /> -->
+<!-- 		</p:column> -->
+		
+		<p:column style="width:75px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.credit.state.CUCR_COLR']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_COLR}" />
+		</p:column>
+		
+		<p:column style="width:70px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.credit.state.CUCR_COLT1']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_COLT1}" />
+		</p:column>
+		
+		<p:column style="width:70px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.credit.state.CUCR_COLR1']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_COLR1}" />
+		</p:column>
+		
+<!-- 		<p:column> -->
+<!-- 			<f:facet name="header"> -->
+<!-- 				<h:outputText value="#{msg['register.table.credit.state.CUCR_COLT2']}" /> -->
+<!-- 			</f:facet> -->
+<!-- 			<h:outputText value="#{data.CUCR_COLT2}" /> -->
+<!-- 		</p:column> -->
+		
+<!-- 		<p:column> -->
+<!-- 			<f:facet name="header"> -->
+<!-- 				<h:outputText value="#{msg['register.table.credit.state.CUCR_COLR2']}" /> -->
+<!-- 			</f:facet> -->
+<!-- 			<h:outputText value="#{data.CUCR_COLR2}" /> -->
+<!-- 		</p:column> -->
+		
+		<p:column style="width:70px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.credit.state.CUCR_COLT3']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_COLT3}" />
+		</p:column>
+		
+		<p:column style="width:70px;">
+			<f:facet name="header">
+				<h:outputText value="#{msg['register.table.credit.state.CUCR_COLR3']}" />
+			</f:facet>
+			<h:outputText value="#{data.CUCR_COLR3}" />
+		</p:column>
+	</p:dataTable>
+</html>

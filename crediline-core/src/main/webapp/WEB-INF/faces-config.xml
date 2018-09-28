@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config
+        xmlns="http://java.sun.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+    http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd"
+        version="2.0">
+
+    <application>
+
+        <el-resolver>org.springframework.web.jsf.el.SpringBeanFacesELResolver</el-resolver>
+
+        <locale-config>
+            <default-locale>bg</default-locale>
+        </locale-config>
+
+        <resource-bundle>
+            <base-name>com.crediline.messages</base-name>
+            <var>msg</var>
+        </resource-bundle>
+
+    </application>
+
+    <!-- <managed-bean>
+         <managed-bean-name>login</managed-bean-name>
+         <managed-bean-class>com.crediline</managed-bean-class>
+         <managed-bean-scope>session</managed-bean-scope>
+         <managed-property>
+             <property-name>customerBo</property-name>
+             <value>#{customerBo}</value>
+         </managed-property>
+     </managed-bean>-->
+
+    <navigation-rule>
+        <from-view-id>/login.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>ROLE_USER</from-outcome>
+            <to-view-id>/userView.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>ROLE_ADMIN</from-outcome>
+            <to-view-id>/adminView.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>ROLE_SUPERADMIN</from-outcome>
+            <to-view-id>/superAdminView.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>login</from-outcome>
+            <to-view-id>/login.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+
+    <converter>
+        <converter-id>personCoverter</converter-id>
+        <converter-class>com.crediline.view.converter.PersonConverter</converter-class>
+    </converter>
+
+    <converter>
+        <converter-id>officeCoverter</converter-id>
+        <converter-class>com.crediline.view.converter.OfficeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <converter-id>person2EgnFirstCoverter</converter-id>
+        <converter-class>com.crediline.view.converter.Person2EGNFirstConverter</converter-class>
+    </converter>
+
+    <converter>
+        <converter-id>dateConverter</converter-id>
+        <converter-class>com.crediline.view.converter.DateConverter</converter-class>
+    </converter>
+
+    <converter>
+        <converter-id>registerFileTypeConverter</converter-id>
+        <converter-class>com.crediline.view.converter.RegisterFileTypeEnumConverter</converter-class>
+    </converter>
+
+    <!-- 	<converter> -->
+    <!--         <converter-id>enumConverter</converter-id> -->
+    <!--         <converter-class>javax.faces.convert.EnumConverter</converter-class> -->
+    <!--     </converter> -->
+
+    <converter>
+        <converter-id>cityConverter</converter-id>
+        <converter-class>com.crediline.view.converter.CityConverter</converter-class>
+    </converter>
+
+    <converter>
+        <converter-id>streetConverter</converter-id>
+        <converter-class>com.crediline.view.converter.StreetConverter</converter-class>
+    </converter>
+
+    <converter>
+        <converter-id>userConverter</converter-id>
+        <converter-class>com.crediline.view.converter.UserConverter</converter-class>
+    </converter>
+
+    <render-kit>
+        <renderer>
+            <component-family>org.primefaces.component</component-family>
+            <renderer-type>org.primefaces.component.FileUploadRenderer</renderer-type>
+            <renderer-class>com.crediline.view.fileUpload.FileUploadRenderer</renderer-class>
+        </renderer>
+    </render-kit>
+</faces-config>

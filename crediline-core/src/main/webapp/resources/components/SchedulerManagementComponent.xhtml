@@ -1,0 +1,89 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <composite:interface>
+        <composite:attribute name="managedBean" required="true"/>
+        <composite:attribute name="uniqueIndex" required="true"/>
+    </composite:interface>
+
+    <composite:implementation>
+        <h:panelGroup layout="block" style="float: left; padding: 10px; width: 100%; height: 100%">
+
+            <h:form id="mainContactsForm_#{cc.attrs.uniqueIndex}" style="width: 100%; height: 100%"
+                    enctype="multipart/form-data">
+
+                <p:growl id="growl_#{cc.attrs.uniqueIndex}" showDetail="true" sticky="true"/>
+                <p:messages id="messages_#{cc.attrs.uniqueIndex}" showDetail="true"/>
+
+                <p:toolbar>
+                    <p:toolbarGroup align="left" style="width: 100%">
+                        <!--<p:commandButton title="#{msg['common.menu.save']}"
+                                         icon="ui-icon-disk"
+                                         update="@form"/>
+                        <p:separator/>
+                        <p:commandButton title="#{msg['common.print']}"
+                                         icon="ui-icon-print"
+                                />-->
+                    </p:toolbarGroup>
+                </p:toolbar>
+
+
+                <h:panelGroup layout="block" style="height: 100%">
+                    <h:panelGrid id="fieldsGrid_#{cc.attrs.uniqueIndex}"
+                                 columns="2" styleClass="grid" style="height: 100%">
+
+                        <p:outputLabel for="creditStateSelector_#{cc.attrs.uniqueIndex}"
+                                       value="#{msg['common.status']}"/>
+                        <h:selectOneMenu id="creditStateSelector_#{cc.attrs.uniqueIndex}"
+                                         value="#{cc.attrs.managedBean.creditState}">
+                            <f:selectItem itemLabel="#{msg['common.all']}" noSelectionOption="true"
+                                          itemValue="#{null}"/>
+                            <f:selectItems
+                                    value="#{data.creditStates}"
+                                    var="creditState"
+                                    itemValue="#{creditState}"
+                                    itemLabel="#{msg['common.realCreditState.'.concat(creditState)]}"/>
+                        </h:selectOneMenu>
+
+
+                        <p:outputLabel value="#{msg['common.startDate']}"/>
+                        <p:calendar id="startDate_#{cc.attrs.uniqueIndex}"
+                                    value="#{cc.attrs.managedBean.startDate}"
+                                    pattern="dd/MM/yyyy" converter="dateConverter"
+                                    showButtonPanel="true" navigator="true"
+                                    mode="popup" showOn="button" popupIconOnly="true" tabindex="2"/>
+
+                        <p:outputLabel value="#{msg['common.endDate']}"/>
+                        <p:calendar id="endDate_#{cc.attrs.uniqueIndex}"
+                                    value="#{cc.attrs.managedBean.endDate}"
+                                    pattern="dd/MM/yyyy" converter="dateConverter"
+                                    showButtonPanel="true" navigator="true"
+                                    mode="popup" showOn="button" popupIconOnly="true" tabindex="2"/>
+
+                        <p:outputLabel value="#{msg['common.resyncCredits']}"/>
+                        <p:commandButton value="#{msg['common.resync']}" icon="" ajax="false" update="@form"
+                                         immediate="false"
+                                         actionListener="#{cc.attrs.managedBean.resyncCredits}"/>
+
+
+                    </h:panelGrid>
+                </h:panelGroup>
+
+                <p:toolbar>
+                    <p:toolbarGroup align="left" style="width: 100%">
+                        <!--<p:commandButton title="#{msg['common.menu.save']}"
+                                         icon="ui-icon-disk"
+                                         update="@form"/>
+                        <p:separator/>
+                        <p:commandButton title="#{msg['common.print']}"
+                                         icon="ui-icon-print"/>-->
+                    </p:toolbarGroup>
+                </p:toolbar>
+            </h:form>
+        </h:panelGroup>
+    </composite:implementation>
+
+</ui:component>

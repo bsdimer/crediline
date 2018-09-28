@@ -1,0 +1,382 @@
+<ui:component xmlns=""
+              xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:c="http://java.sun.com/jsp/jstl/core"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<composite:interface>
+    <composite:attribute name="managedBean" required="true"/>
+    <composite:attribute name="uniqueIndex" required="true"/>
+</composite:interface>
+
+<composite:implementation>
+<h:panelGroup layout="block" style="float: left; padding: 10px; width: 100%">
+
+<h:form id="mainContactsForm_#{cc.attrs.uniqueIndex}">
+
+<p:growl id="growl_#{cc.attrs.uniqueIndex}" showDetail="true" sticky="true"/>
+<p:messages id="messages_#{cc.attrs.uniqueIndex}" showDetail="true"/>
+<p:focus for="officeName_#{cc.attrs.uniqueIndex}"/>
+
+<p:toolbar style="width: 100%">
+    <p:toolbarGroup align="left">
+        <p:commandButton title="#{msg['common.menu.save']}" icon="ui-icon-disk"
+                         actionListener="#{cc.attrs.managedBean.saveAndClose}" update="@form"/>
+        <p:separator/>
+        <p:commandButton title="#{msg['common.print']}" icon="ui-icon-print"/>
+    </p:toolbarGroup>
+</p:toolbar>
+
+<p:fieldset legend="#{msg['common.main']}" style="margin-top: 10px; !important;">
+
+    <h:panelGrid id="mainGrid_#{cc.attrs.uniqueIndex}" columns="2"
+                 columnClasses="label, value, message">
+
+        <h:outputLabel for="officeName_#{cc.attrs.uniqueIndex}" value="#{msg['common.name']}"/>
+        <p:inputText id="officeName_#{cc.attrs.uniqueIndex}" required="true" tabindex="1"
+                     label="#{msg['common.name']}"
+                     value="#{cc.attrs.managedBean.office.name}">
+        </p:inputText>
+
+        <h:outputLabel for="region_#{cc.attrs.uniqueIndex}" value="#{msg['common.menu.region']}"/>
+        <p:selectOneMenu id="region_#{cc.attrs.uniqueIndex}" required="true" tabindex="2" converter="#{regionConverter}"
+                         label="#{msg['common.menu.region']}" value="#{cc.attrs.managedBean.office.region}">
+            <f:selectItems value="#{autoComplete.allRegions}" var="region" itemLabel="#{region.name}"
+                           itemValue="#{region}"/>
+        </p:selectOneMenu>
+
+    </h:panelGrid>
+
+</p:fieldset>
+
+
+<p:fieldset legend="#{msg['common.modata']}" style="margin-top: 10px; !important;">
+    <h:panelGroup id="additionalDiv_#{cc.attrs.uniqueIndex}" layout="block" style="float: left"
+                  rendered="true">
+        <h:panelGrid id="additionalGrid_#{cc.attrs.uniqueIndex}" columns="2" columnClasses="label, value">
+            <p:outputLabel for="officeManager_#{cc.attrs.uniqueIndex}"
+                           value="#{msg['common.manager']}"/>
+            <p:autoComplete id="officeManager_#{cc.attrs.uniqueIndex}" required="true"
+                            label="#{msg['common.manager']}" panelStyle="width:600px"
+                            queryDelay="1000" cache="true" cacheTimeout="6000"
+                            value="#{cc.attrs.managedBean.office.manager}" converter="#{personConverter}"
+                            completeMethod="#{autoComplete.autoCompletePerson}" maxResults="10" var="p"
+                            itemValue="#{p}" itemLabel="#{p.fullName}"
+                            dropdown="true">
+
+                <p:column headerText="#{msg['common.name']}">
+                    #{p.name} #{p.midname} #{p.surname}
+                </p:column>
+
+                <p:column>
+                    #{p.egn}
+                </p:column>
+
+                <p:column>
+                    #{p.addresses[0].city}
+                </p:column>
+
+                <p:column>
+                    #{p.addresses[0].street}
+                </p:column>
+
+                <p:column>
+                    #{p.addresses[0].number}
+                </p:column>
+
+                <p:column>
+                    #{p.addresses[0].entrance}
+                </p:column>
+
+                <p:column>
+                    #{p.addresses[0].floor}
+                </p:column>
+
+                <p:column>
+                    #{p.addresses[0].apartment}
+                </p:column>
+            </p:autoComplete>
+
+            <p:outputLabel for="mopc_#{cc.attrs.uniqueIndex}"
+                           value="#{msg['common.postcode']}"/>
+            <p:inputMask id="mopc_#{cc.attrs.uniqueIndex}" required="false"
+                         label="#{msg['common.postcode']}" mask="9999"
+                         value="#{cc.attrs.managedBean.office.mopc}">
+            </p:inputMask>
+
+            <p:outputLabel for="mocity_#{cc.attrs.uniqueIndex}"
+                           value="#{msg['common.city']}"/>
+            <p:inputText id="mocity_#{cc.attrs.uniqueIndex}" required="false"
+                         label="#{msg['common.city']}"
+                         value="#{cc.attrs.managedBean.office.mocity}">
+            </p:inputText>
+
+            <p:outputLabel for="moregion_#{cc.attrs.uniqueIndex}"
+                           value="#{msg['common.pk']}"/>
+            <p:inputText id="moregion_#{cc.attrs.uniqueIndex}" required="false"
+                         label="#{msg['common.pk']}"
+                         value="#{cc.attrs.managedBean.office.moregion}">
+            </p:inputText>
+
+            <p:outputLabel for="mooblast_#{cc.attrs.uniqueIndex}"
+                           value="#{msg['common.oblast']}"/>
+            <p:inputText id="mooblast_#{cc.attrs.uniqueIndex}" required="false"
+                         label="#{msg['common.oblast']}"
+                         value="#{cc.attrs.managedBean.office.mooblast}">
+            </p:inputText>
+
+            <p:outputLabel for="mobank_#{cc.attrs.uniqueIndex}"
+                           value="#{msg['common.bank']}"/>
+            <p:inputText id="mobank_#{cc.attrs.uniqueIndex}" required="false"
+                         label="#{msg['common.bank']}"
+                         value="#{cc.attrs.managedBean.office.mobank}">
+            </p:inputText>
+
+            <p:outputLabel for="moap_#{cc.attrs.uniqueIndex}"
+                           value="#{msg['common.apartment']}"/>
+            <p:inputText id="moap_#{cc.attrs.uniqueIndex}" required="false"
+                         label="#{msg['common.apartment']}"
+                         value="#{cc.attrs.managedBean.office.moap}">
+            </p:inputText>
+
+            <p:outputLabel for="mophone_#{cc.attrs.uniqueIndex}"
+                           value="#{msg['common.contacts.phone']}"/>
+            <p:inputText id="mophone_#{cc.attrs.uniqueIndex}" required="false"
+                         label="#{msg['common.contacts.phone']}"
+                         value="#{cc.attrs.managedBean.office.mophone}">
+            </p:inputText>
+
+            <p:outputLabel for="motitular_#{cc.attrs.uniqueIndex}"
+                           value="#{msg['common.titular']}"/>
+            <p:inputText id="motitular_#{cc.attrs.uniqueIndex}" required="false"
+                         label="#{msg['common.titular']}"
+                         value="#{cc.attrs.managedBean.office.motitular}">
+            </p:inputText>
+
+            <p:outputLabel for="regionalManager_#{cc.attrs.uniqueIndex}"
+                           value="#{msg['common.regionalManager']}"/>
+            <p:autoComplete id="regionalManager_#{cc.attrs.uniqueIndex}" required="false"
+                            label="#{msg['common.regionalManager']}" panelStyle="width:600px"
+                            queryDelay="1000" cache="true" cacheTimeout="6000"
+                            value="#{cc.attrs.managedBean.region.manager}" converter="#{personConverter}"
+                            completeMethod="#{autoComplete.autoCompletePerson}" maxResults="10" var="p"
+                            itemValue="#{p}" itemLabel="#{p.fullName}"
+                            dropdown="true">
+
+                <p:column headerText="#{msg['common.name']}">
+                    #{p.name} #{p.midname} #{p.surname}
+                </p:column>
+
+                <p:column>
+                    #{p.egn}
+                </p:column>
+
+                <p:column>
+                    #{p.addresses[0].city}
+                </p:column>
+
+                <p:column>
+                    #{p.addresses[0].street}
+                </p:column>
+
+                <p:column>
+                    #{p.addresses[0].number}
+                </p:column>
+
+                <p:column>
+                    #{p.addresses[0].entrance}
+                </p:column>
+
+                <p:column>
+                    #{p.addresses[0].floor}
+                </p:column>
+
+                <p:column>
+                    #{p.addresses[0].apartment}
+                </p:column>
+            </p:autoComplete>
+
+            <p:outputLabel for="moOfficeManagerEn_#{cc.attrs.uniqueIndex}"
+                           value="regional manager"/>
+            <p:inputText id="moOfficeManagerEn_#{cc.attrs.uniqueIndex}" required="false"
+                         label="regional manager"
+                         value="#{cc.attrs.managedBean.office.moOfficeManagerNameEn}">
+            </p:inputText>
+
+        </h:panelGrid>
+    </h:panelGroup>
+</p:fieldset>
+
+<p:fieldset legend="#{msg['common.menu.addresses']}" style="margin-top: 10px; !important;">
+    <h:panelGroup id="addressDiv_#{cc.attrs.uniqueIndex}" layout="block" style="float: left"
+                  rendered="true">
+        <h:panelGrid id="addressGrid_#{cc.attrs.uniqueIndex}" columns="2"
+                     columnClasses="label, value, message">
+
+            <p:outputLabel for="addressCountry_#{cc.attrs.uniqueIndex}"
+                           value="#{msg['common.country']}"/>
+            <p:autoComplete id="addressCountry_#{cc.attrs.uniqueIndex}" required="false"
+                            label="#{msg['common.country']}" cache="true" cacheTimeout="6000"
+                            value="#{cc.attrs.managedBean.office.address.country}"
+                            completeMethod="#{autoComplete.autoCompleteCountries}">
+            </p:autoComplete>
+
+            <p:outputLabel for="addressCity_#{cc.attrs.uniqueIndex}" value="#{msg['common.city']}"/>
+            <p:autoComplete id="addressCity_#{cc.attrs.uniqueIndex}" required="false" cache="true" cacheTimeout="6000"
+                            label="#{msg['common.city']}" panelStyle="width:600px" queryDelay="1000"
+                            value="#{cc.attrs.managedBean.office.address.city}" converter="#{cityConverter}"
+                            completeMethod="#{autoComplete.autoCompleteCities}" maxResults="10" effect="fade"
+                            var="c" itemValue="#{c}" itemLabel="#{c.name}">
+                <p:column>
+                    #{c.name}
+                </p:column>
+
+                <p:column>
+                    #{c.oblast}
+                </p:column>
+
+                <p:column>
+                    #{c.obshtina}
+                </p:column>
+
+            </p:autoComplete>
+
+
+            <p:outputLabel for="addressQuarter_#{cc.attrs.uniqueIndex}"
+                           value="#{msg['common.quarter']}"/>
+            <p:inputText id="addressQuarter_#{cc.attrs.uniqueIndex}" required="false"
+                         label="#{msg['common.quarter']}"
+                         value="#{cc.attrs.managedBean.office.address.quarter}">
+            </p:inputText>
+
+
+            <p:outputLabel for="addressStreet_#{cc.attrs.uniqueIndex}" value="#{msg['common.street']}"/>
+            <p:autoComplete id="addressStreet_#{cc.attrs.uniqueIndex}" required="false"
+                            label="#{msg['common.street']}" cache="true" cacheTimeout="6000"
+                            value="#{cc.attrs.managedBean.office.address.street}" converter="#{streetConverter}"
+                            completeMethod="#{autoComplete.autoCompleteStreets}" maxResults="10" effect="fade"
+                            var="s" itemValue="#{s}" itemLabel="#{s.name}">
+                <p:column>
+                    #{s.name}
+                </p:column>
+            </p:autoComplete>
+
+
+            <p:outputLabel for="addressNumber_#{cc.attrs.uniqueIndex}" value="#{msg['common.number']}"/>
+            <p:inputText id="addressNumber_#{cc.attrs.uniqueIndex}" style="width: 60px"
+                         label="#{msg['common.number']}"
+                         value="#{cc.attrs.managedBean.office.address.number}">
+            </p:inputText>
+
+
+            <p:outputLabel for="addressEntrance_#{cc.attrs.uniqueIndex}"
+                           value="#{msg['common.entrance']}"/>
+            <p:inputText id="addressEntrance_#{cc.attrs.uniqueIndex}" required="false"
+                         style="width: 60px"
+                         label="#{msg['common.entrance']}"
+                         value="#{cc.attrs.managedBean.office.address.entrance}">
+            </p:inputText>
+
+
+            <p:outputLabel for="addressFloor_#{cc.attrs.uniqueIndex}" value="#{msg['common.floor']}"/>
+            <p:inputText id="addressFloor_#{cc.attrs.uniqueIndex}" required="false" style="width: 60px"
+                         label="#{msg['common.floor']}"
+                         value="#{cc.attrs.managedBean.office.address.floor}">
+            </p:inputText>
+
+
+            <p:outputLabel for="addressApartment_#{cc.attrs.uniqueIndex}"
+                           value="#{msg['common.apartment']}"/>
+            <p:inputText id="addressApartment_#{cc.attrs.uniqueIndex}" required="false"
+                         style="width: 60px"
+                         label="#{msg['common.apartment']}"
+                         value="#{cc.attrs.managedBean.office.address.apartment}">
+            </p:inputText>
+
+        </h:panelGrid>
+    </h:panelGroup>
+
+</p:fieldset>
+
+
+<p:fieldset legend="#{msg['common.contacts.phones']}"
+            style="margin-top: 10px; !important;">
+    <h:panelGroup id="phonesDiv_#{cc.attrs.uniqueIndex}" layout="block" style="float: left" rendered="true">
+        <h:panelGrid id="phoneGrid_#{cc.attrs.uniqueIndex}" columns="2" columnClasses="label, value">
+            <p:outputLabel for="phoneInput_#{cc.attrs.uniqueIndex}" value="#{msg['common.contacts.phone']}"/>
+            <p:inputText id="phoneInput_#{cc.attrs.uniqueIndex}" required="false"
+                         label="#{msg['common.contacts.phone']}"
+                         value="#{cc.attrs.managedBean.phone.number}">
+            </p:inputText>
+
+
+            <p:outputLabel for="phoneType_#{cc.attrs.uniqueIndex}" value="#{msg['common.type']}"/>
+            <h:selectOneMenu id="phoneType_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.phone.phoneType}">
+                <f:selectItems
+                        value="#{data.phoneTypes}"
+                        var="phoneType"
+                        itemValue="#{phoneType}"
+                        itemLabel="#{msg['phone.phoneType.'.concat(phoneType)]}"/>
+            </h:selectOneMenu>
+            <p:outputLabel value=""/>
+
+            <p:outputLabel value=""/>
+            <p:commandButton value="#{msg['common.add']} #{msg['common.contacts.phone']}"
+                             update="phoneAccordionDiv_#{cc.attrs.uniqueIndex}, @parent"
+                             process="@this, phoneInput_#{cc.attrs.uniqueIndex}, phoneType_#{cc.attrs.uniqueIndex}"
+                             actionListener="#{cc.attrs.managedBean.addPhone2Office}"
+                             style="margin-bottom: 20px" icon="ui-icon-plusthick">
+            </p:commandButton>
+        </h:panelGrid>
+    </h:panelGroup>
+    <h:panelGroup id="phoneAccordionDiv_#{cc.attrs.uniqueIndex}" layout="block" style="float: left" rendered="true">
+        <p:accordionPanel id="phoneAccordion_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.office.phones}"
+                          var="phone"
+                          dynamic="true">
+            <p:tab title="#{msg['phone.phoneType.'.concat(phone.phoneType)]}">
+                <h:panelGrid columns="2" columnClasses="label, value">
+                    <p:outputLabel value="#{msg['common.contacts.phone']}"/>
+                    <p:inputText required="false"
+                                 label="#{msg['common.contacts.phone']}"
+                                 value="#{phone.number}">
+                    </p:inputText>
+
+                    <p:outputLabel value="#{msg['common.type']}"/>
+                    <h:selectOneMenu value="#{phone.phoneType}">
+                        <f:selectItems
+                                value="#{data.phoneTypes}"
+                                var="phoneType"
+                                itemValue="#{phoneType}"
+                                itemLabel="#{msg['phone.phoneType.'.concat(phoneType)]}"/>
+                    </h:selectOneMenu>
+
+                    <p:outputLabel value=""/>
+                    <p:commandButton value="#{msg['common.delete']}"
+                                     update="@form:phoneAccordionDiv_#{cc.attrs.uniqueIndex}" process="@this"
+                                     actionListener="#{cc.attrs.managedBean.removePhone}"
+                                     style="margin-bottom: 20px" icon="ui-icon-plusthick">
+                        <f:attribute name="parameter" value="#{phone}"/>
+                    </p:commandButton>
+                </h:panelGrid>
+            </p:tab>
+        </p:accordionPanel>
+    </h:panelGroup>
+
+</p:fieldset>
+
+<p:toolbar style="width: 100%">
+    <p:toolbarGroup align="left">
+        <p:commandButton title="#{msg['common.menu.save']}" icon="ui-icon-disk"
+                         actionListener="#{cc.attrs.managedBean.saveAndClose}" update="@form"/>
+        <p:separator/>
+        <p:commandButton title="#{msg['common.print']}" icon="ui-icon-print"/>
+    </p:toolbarGroup>
+</p:toolbar>
+
+</h:form>
+</h:panelGroup>
+</composite:implementation>
+
+</ui:component>

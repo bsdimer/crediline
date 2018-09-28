@@ -1,0 +1,303 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:c="http://java.sun.com/jsp/jstl/core"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:components="http://java.sun.com/jsf/composite/components">
+
+<composite:interface>
+    <composite:attribute name="uniqueIndex" required="true"/>
+</composite:interface>
+
+<composite:implementation>
+<h:panelGroup layout="block" style="float: left; width: 100%">
+
+<h:form id="mainContactsForm_#{cc.attrs.uniqueIndex}" style="width: 100%" prependId="false">
+
+<p:growl id="growl_#{cc.attrs.uniqueIndex}" showDetail="true" sticky="true"/>
+<p:messages id="messages_#{cc.attrs.uniqueIndex}" showDetail="true"/>
+
+<p:toolbar>
+    <f:facet name="left">
+        <p:commandButton icon="ui-icon-search"
+                         actionListener="#{inquiryFuturePayments.searchOnStreet}"
+                         value="#{msg['common.onStreet']}"
+                         update="resultDiv_#{cc.attrs.uniqueIndex}, summaryPG_#{cc.attrs.uniqueIndex}"/>
+
+        <p:commandButton icon="ui-icon-search"
+                         actionListener="#{inquiryFuturePayments.searchOnStreetNo}"
+                         value="#{msg['common.onNumber']}"
+                         update="resultDiv_#{cc.attrs.uniqueIndex}, summaryPG_#{cc.attrs.uniqueIndex}"/>
+
+        <p:commandButton icon="ui-icon-search"
+                         actionListener="#{inquiryFuturePayments.searchOnCity}"
+                         value="#{msg['common.onCity']}" disabled="true"
+                         update="resultDiv_#{cc.attrs.uniqueIndex}, summaryPG_#{cc.attrs.uniqueIndex}"/>
+
+    </f:facet>
+</p:toolbar>
+
+
+<h:panelGroup layout="block" id="mainContainer_#{cc.attrs.uniqueIndex}"
+              style="height: 100%">
+<h:panelGroup layout="block" style="float: left; width: 25%; height: 100%">
+    <h:panelGroup layout="block" style="clear: both; height: 100%">
+
+        <p:fieldset legend="#{msg['common.credit.timeParameters']}"
+                    style="margin-top: 10px; margin-right: 10px">
+            <h:panelGrid columns="2" styleClass="grid">
+
+                <p:outputLabel for="startDate_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.startDate']}"/>
+                <p:calendar id="startDate_#{cc.attrs.uniqueIndex}"
+                            value="#{inquiryFuturePayments.startDate}"
+                            pattern="dd/MM/yyyy" converter="dateConverter"
+                            showButtonPanel="true" navigator="true"
+                            mode="popup" showOn="button" popupIconOnly="true" tabindex="3"/>
+
+                <p:outputLabel for="endDate_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.endDate']}"/>
+                <p:calendar id="endDate_#{cc.attrs.uniqueIndex}"
+                            value="#{inquiryFuturePayments.endDate}"
+                            pattern="dd/MM/yyyy" converter="dateConverter"
+                            showButtonPanel="true" navigator="true"
+                            mode="popup" showOn="button" popupIconOnly="true" tabindex="2"/>
+
+            </h:panelGrid>
+        </p:fieldset>
+
+        <p:fieldset legend="#{msg['common.personData']}" style="margin-top: 10px; margin-right: 10px">
+            <h:panelGrid columns="2" styleClass="grid">
+                <p:outputLabel for="personReference_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.menu.assosiedPerson']}"/>
+                <p:autoComplete id="personReference_#{cc.attrs.uniqueIndex}"
+                                cache="true" cacheTimeout="6000"
+                                label="#{msg['common.credit-owner']}" panelStyle="width:600px" queryDelay="1500"
+                                value="#{inquiryFuturePayments.person}" converter="#{personConverter}"
+                                completeMethod="#{autoComplete.autoCompletePerson}" maxResults="10" var="p"
+                                itemValue="#{p}" itemLabel="#{p.name} #{p.midname} #{p.surname}" dropdown="true">
+
+                    <p:column headerText="#{msg['common.name']}">
+                        #{p.name} #{p.midname} #{p.surname}
+                    </p:column>
+
+                    <p:column>
+                        #{p.egn}
+                    </p:column>
+
+                    <p:column>
+                        #{p.addresses[0].city}
+                    </p:column>
+
+                    <p:column>
+                        #{p.addresses[0].street}
+                    </p:column>
+
+                    <p:column>
+                        #{p.addresses[0].number}
+                    </p:column>
+
+                    <p:column>
+                        #{p.addresses[0].entrance}
+                    </p:column>
+
+                    <p:column>
+                        #{p.addresses[0].floor}
+                    </p:column>
+
+                    <p:column>
+                        #{p.addresses[0].apartment}
+                    </p:column>
+
+                </p:autoComplete>
+
+                <!--<p:outputLabel for="personName_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.name']}"/>
+                <p:inputText id="personName_#{cc.attrs.uniqueIndex}"
+                             value="#{inquiryFuturePayments.personName}"/>
+
+                <p:outputLabel for="personMidname_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.midname']}"/>
+                <p:inputText id="personMidname_#{cc.attrs.uniqueIndex}"
+                             value="#{inquiryFuturePayments.personMidname}"/>
+
+                <p:outputLabel for="personSurname_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.surname']}"/>
+                <p:inputText id="personSurname_#{cc.attrs.uniqueIndex}"
+                             value="#{inquiryFuturePayments.personSurname}"/>
+
+                <p:outputLabel for="personEgn_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.egn']}"/>
+                <p:inputText id="personEgn_#{cc.attrs.uniqueIndex}"
+                             value="#{inquiryFuturePayments.personEgn}"/>-->
+
+            </h:panelGrid>
+        </p:fieldset>
+
+        <p:fieldset legend="#{msg['common.location']}" style="margin-top: 10px; margin-right: 10px">
+            <h:panelGrid columns="2" styleClass="grid">
+                <p:outputLabel for="city_#{cc.attrs.uniqueIndex}" value="#{msg['common.city']}"/>
+                <p:autoComplete id="city_#{cc.attrs.uniqueIndex}" required="false"
+                                cache="true" cacheTimeout="6000" label="#{msg['common.city']}" panelStyle="width:600px"
+                                queryDelay="1000" value="#{inquiryFuturePayments.city}"
+                                converter="#{cityConverter}" completeMethod="#{autoComplete.autoCompleteCities}"
+                                maxResults="10" effect="fade"
+                                var="c" itemValue="#{c}" itemLabel="#{c.name}">
+                    <p:column>
+                        #{c.name}
+                    </p:column>
+
+                    <p:column>
+                        #{c.oblast}
+                    </p:column>
+
+                    <p:column>
+                        #{c.obshtina}
+                    </p:column>
+
+                </p:autoComplete>
+
+                <p:outputLabel for="street_#{cc.attrs.uniqueIndex}" value="#{msg['common.street']}"/>
+                <p:autoComplete id="street_#{cc.attrs.uniqueIndex}" required="false"
+                                label="#{msg['common.street']}" cache="true" cacheTimeout="6000"
+                                value="#{inquiryFuturePayments.street}" converter="#{streetConverter}"
+                                completeMethod="#{autoComplete.autoCompleteStreets}" maxResults="10"
+                                effect="fade" var="s" itemValue="#{s}" itemLabel="#{s.name}">
+                    <p:column>
+                        #{s.name}
+                    </p:column>
+                </p:autoComplete>
+
+                <p:outputLabel for="streetNo_#{cc.attrs.uniqueIndex}" value="#{msg['common.number']}"/>
+                <p:inputText id="streetNo_#{cc.attrs.uniqueIndex}" value="#{inquiryFuturePayments.number}"/>
+
+            </h:panelGrid>
+        </p:fieldset>
+
+        <p:fieldset legend="#{msg['common.summary']}"
+                    style="margin-top: 10px; margin-right: 10px">
+            <h:panelGrid id="summaryPG_#{cc.attrs.uniqueIndex}" columns="2" styleClass="grid">
+
+                <p:outputLabel style="font-weight: bold" value="#{msg['common.dueSumForPeriod']}"/>
+                <p:outputLabel value="#{inquiryFuturePayments.sumForThePeriod}"/>
+
+                <p:outputLabel style="font-weight: bold" value="#{msg['common.dueSum']}"/>
+                <p:outputLabel value="#{inquiryFuturePayments.fullSumForThePeriod}"/>
+
+                <p:outputLabel style="font-weight: bold" value="#{msg['common.dueSumUntilNow']}"/>
+                <p:outputLabel value="#{inquiryFuturePayments.dueSumUntilNow}"/>
+
+            </h:panelGrid>
+        </p:fieldset>
+
+        <!--<p:fieldset legend="#{msg['common.additional']}" style="margin-top: 10px; margin-right: 10px">
+            <h:panelGrid columns="2" styleClass="grid">
+
+                <p:outputLabel for="personRating_#{cc.attrs.uniqueIndex}"
+                               value="#{msg['common.rating']}"/>
+                <h:panelGroup layout="block">
+                    <p:selectOneMenu value="#{inquiryFuturePayments.rangeSelector}">
+                        <f:selectItem itemLabel="#{msg['common.equal']}" itemValue="eq"/>
+                        <f:selectItem itemLabel="#{msg['common.greaterThan']}" itemValue="gt"/>
+                        <f:selectItem itemLabel="#{msg['common.lessThan']}" itemValue="lt"/>
+                    </p:selectOneMenu>
+                    <p:rating id="personRating_#{cc.attrs.uniqueIndex}" stars="10"
+                              value="#{inquiryFuturePayments.person.rating}"/>
+                </h:panelGroup>
+
+            </h:panelGrid>
+        </p:fieldset>-->
+
+    </h:panelGroup>
+</h:panelGroup>
+<h:panelGroup layout="block" style="margin-top: 13px; float: left; width: 75%; height: 100%">
+
+    <h:panelGroup id="resultDiv_#{cc.attrs.uniqueIndex}" layout="block"
+                  style="clear: both; height: 100%; margin-bottom: 20px">
+        <h:outputText style="margin: 20px 10px 15px;"
+                      value="#{msg['common.countResults']}: #{inquiryFuturePayments.result.size()}"/>
+        <p:dataTable var="person" value="#{inquiryFuturePayments.result}" scrollRows="20"
+                     scrollable="true" liveScroll="true" scrollHeight="535"
+                     lazy="true" id="tableResult_#{cc.attrs.uniqueIndex}"
+                     widgetVar="resultTable_#{cc.attrs.uniqueIndex}">
+
+            <p:column headerText="id" width="5%" sortBy="#{person.id}">
+                <h:outputText value="#{person.id}"/>
+            </p:column>
+
+            <p:column headerText="#{msg['common.fullname']}" sortBy="#{person.fullName}">
+                <h:outputText value="#{person.fullName}"/>
+            </p:column>
+
+            <p:column headerText="#{msg['common.egn']}" sortBy="#{person.egn}" style="width:80px">
+                <h:outputText value="#{person.egn}"/>
+            </p:column>
+
+            <p:column headerText="#{msg['common.menu.address']}" sortBy="#{person.addresses[0]}">
+                <h:outputText value="#{person.addresses[0]}"/>
+            </p:column>
+
+            <p:column headerText="#{msg['common.dueSumForPeriod']}" style="width:80px">
+                <h:outputText value="#{inquiryFuturePayments.dueSumForPeriod(person)}"/>
+            </p:column>
+
+            <p:column headerText="#{msg['common.dueSum']}" style="width:80px">
+                <h:outputText value="#{person.dueSum}"/>
+            </p:column>
+
+            <p:column headerText="#{msg['common.rating']}" style="width: 180px" sortBy="#{person.rating}">
+                <p:rating stars="10" value="#{person.rating}"/>
+            </p:column>
+
+            <!--<p:column style="width:30px">
+                <p:commandButton id="selectPersonButton_#{cc.attrs.uniqueIndex}"
+                                 update="@form:personDetailsPG_#{cc.attrs.uniqueIndex}"
+                                 oncomplete="PF('dialogDetailsPerson_#{cc.attrs.uniqueIndex}').show()"
+                                 icon="ui-icon-search"
+                                 title="View">
+                    <f:setPropertyActionListener value="#{person}" target="#{inquiryFuturePayments.selectedPerson}"/>
+                </p:commandButton>
+            </p:column>
+
+            <p:column style="width:30px">
+                <p:commandButton id="editPersonButton_#{cc.attrs.uniqueIndex}"
+                                 update="@form:editPersonPG_#{cc.attrs.uniqueIndex}"
+                                 oncomplete="PF('editPersonDialog_#{cc.attrs.uniqueIndex}').show()"
+                                 icon="ui-icon-pencil"
+                                 title="Edit">
+                    <f:setPropertyActionListener value="#{person}" target="#{inquiryFuturePayments.selectedPerson}"/>
+                </p:commandButton>
+            </p:column>-->
+
+        </p:dataTable>
+    </h:panelGroup>
+</h:panelGroup>
+</h:panelGroup>
+
+
+<h:panelGroup layout="block" style="clear: both; width: 100%; margin-top: 20px">
+    <p:toolbar>
+        <f:facet name="left">
+            <p:commandButton icon="ui-icon-search"
+                             actionListener="#{inquiryFuturePayments.searchOnStreet}"
+                             value="#{msg['common.onStreet']}"
+                             update="resultDiv_#{cc.attrs.uniqueIndex}, summaryPG_#{cc.attrs.uniqueIndex}"/>
+
+            <p:commandButton icon="ui-icon-search"
+                             actionListener="#{inquiryFuturePayments.searchOnStreetNo}"
+                             value="#{msg['common.onNumber']}"
+                             update="resultDiv_#{cc.attrs.uniqueIndex}, summaryPG_#{cc.attrs.uniqueIndex}"/>
+
+            <p:commandButton icon="ui-icon-search"
+                             actionListener="#{inquiryFuturePayments.searchOnCity}"
+                             value="#{msg['common.onCity']}"
+                             update="resultDiv_#{cc.attrs.uniqueIndex}, summaryPG_#{cc.attrs.uniqueIndex}"/>
+
+        </f:facet>
+    </p:toolbar>
+</h:panelGroup>
+</h:form>
+</h:panelGroup>
+</composite:implementation>
+
+</ui:component>

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>crediline</artifactId>
+        <groupId>com.crediline</groupId>
+        <version>0.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>qz-applet</artifactId>
+
+    <properties>
+        <artifactName>${project.artifactId}-${project.version}</artifactName>
+        <maven-jarsigner-plugin.version>1.2</maven-jarsigner-plugin.version>
+        <outputDir>${project.build.directory}/${artifactName}/</outputDir>
+        <keyStorePath>keystore.jks</keyStorePath>
+        <alias>signer</alias>
+        <password>!secret</password>
+
+        <permissions>all-permissions</permissions>
+        <codebase>192.168.43.49 192.168.1.116 127.0.0.1 localhost 78.159.157.87 zig.zag.bg file://* crediline.bg
+            crediline.com
+        </codebase>
+        <caller-allowable-codebase>192.168.43.49 192.168.1.116 127.0.0.1 localhost 78.159.157.87 zig.zag.bg
+            file://*crediline.bg crediline.com
+        </caller-allowable-codebase>
+        <application-library-allowable-codebase>192.168.43.49 192.168.1.116 127.0.0.1 localhost 78.159.157.87 zig.zag.bg
+            file://* crediline.bg crediline.com
+        </application-library-allowable-codebase>
+        <manifest-class-path>lib/jssc_qz.jar lib/pdf-renderer_qz.jar lib/plugin.jar</manifest-class-path>
+        <trusted-only>true</trusted-only>
+
+        <applet.resources.copy.dir>${project.build.directory}/../../crediline-core/src/main/webapp/resources
+        </applet.resources.copy.dir>
+        <main-class>qz.Main</main-class>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.tf</groupId>
+            <artifactId>jssc</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tf</groupId>
+            <artifactId>pdf-renderer</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-dev</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>sun.plugin</groupId>
+            <artifactId>plugin</artifactId>
+            <version>1.7</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/plugin.jar</systemPath>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>public</id>
+            <name>Public Repositories</name>
+            <url>http://jerry.overos.com:8081/nexus/content/repositories/thirdparty</url>
+        </repository>
+    </repositories>
+
+    <build>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>rootCA.cer</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <!-- security parameters -->
+                            <Application-Name>Printing Applet</Application-Name>
+                            <Permissions>${permissions}</Permissions>
+                            <Codebase>*</Codebase>
+                            <Caller-Allowable-Codebase>*</Caller-Allowable-Codebase>
+                            <Application-Library-Allowable-Codebase>*</Application-Library-Allowable-Codebase>
+                            <Class-Path>${manifest-class-path}</Class-Path>
+                            <Trusted-Only>${trusted-only}</Trusted-Only>
+                            <Main-Class>${main-class}</Main-Class>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>assembly.xml</descriptor>
+                    </descriptors>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                    </archive>
+                    <finalName>${artifactName}</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jarsigner-plugin</artifactId>
+                <version>${maven-jarsigner-plugin.version}</version>
+                <configuration>
+                    <keystore>${keyStorePath}</keystore>
+                    <alias>${alias}</alias>
+                    <storepass>${password}</storepass>
+                    <archiveDirectory>${outputDir}</archiveDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>sign</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>verify</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-applet-js</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${applet.resources.copy.dir}/js</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <includes>
+                                        <include>*.js</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-applet-jnlp</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${applet.resources.copy.dir}/qzprint-applet</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <includes>
+                                        <include>*.jnlp</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-applet-signed-jar</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${applet.resources.copy.dir}/qzprint-applet</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>${artifactName}.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-applet-libs</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${applet.resources.copy.dir}/qzprint-applet/lib</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/src/main/resources/lib</directory>
+                                    <includes>
+                                        <include>*.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>

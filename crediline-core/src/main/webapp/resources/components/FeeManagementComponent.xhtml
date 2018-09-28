@@ -1,0 +1,62 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:c="http://java.sun.com/jsp/jstl/core"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <composite:interface>
+        <composite:attribute name="managedBean" required="true"/>
+        <composite:attribute name="uniqueIndex" required="true"/>
+    </composite:interface>
+
+    <composite:implementation>
+        <h:panelGroup layout="block" style="float: left; padding: 10px">
+
+            <h:form id="creditRegisterForm_#{cc.attrs.uniqueIndex}">
+
+                <p:growl id="growl_#{cc.attrs.uniqueIndex}" showDetail="true" sticky="true"/>
+                <p:messages id="messages_#{cc.attrs.uniqueIndex}" showDetail="true"/>
+
+                <p:toolbar>
+                    <p:toolbarGroup align="left">
+                        <p:commandButton title="#{msg['common.menu.save']}"
+                                         icon="ui-icon-disk" actionListener="#{cc.attrs.managedBean.save}"
+                                         update="@form"/>
+                    </p:toolbarGroup>
+                </p:toolbar>
+                <h:panelGrid id="mainGrid_#{cc.attrs.uniqueIndex}" columns="2"
+                             columnClasses="label, value">
+                    <p:outputLabel for="smallCredit_#{cc.attrs.uniqueIndex}"
+                                   value="#{msg['common.from']} #{cc.attrs.managedBean.min} #{msg['common.to']} #{cc.attrs.managedBean.max}"
+                                   style="margin-left: 10px"/>
+                    <p:spinner id="smallCredit_#{cc.attrs.uniqueIndex}"
+                               value="#{cc.attrs.managedBean.smallCreditProperty}" suffix="%" tabindex="1"/>
+
+                    <p:outputLabel for="bigCredit_#{cc.attrs.uniqueIndex}"
+                                   value="#{msg['common.under']} #{cc.attrs.managedBean.max}"
+                                   style="margin-left: 10px"/>
+                    <p:spinner id="bigCredit_#{cc.attrs.uniqueIndex}"
+                               value="#{cc.attrs.managedBean.bigCreditProperty}"
+                               suffix="#{msg['common.currency.bg']}" tabindex="2"/>
+                    <p:outputLabel for="mlpCredit_#{cc.attrs.uniqueIndex}"
+                                   value="#{msg['common.mlp']}"
+                                   style="margin-left: 10px"/>
+                    <p:spinner id="mlpCredit_#{cc.attrs.uniqueIndex}"
+                               value="#{cc.attrs.managedBean.bigCreditProperty}"
+                               suffix="#{msg['common.currency.bg']}" tabindex="2"/>
+                </h:panelGrid>
+                <p:toolbar>
+                    <p:toolbarGroup align="left">
+                        <p:commandButton title="#{msg['common.menu.save']}"
+                                         icon="ui-icon-disk" actionListener="#{cc.attrs.managedBean.save}"
+                                         update="@form"/>
+
+                    </p:toolbarGroup>
+                </p:toolbar>
+            </h:form>
+        </h:panelGroup>
+    </composite:implementation>
+
+</ui:component>

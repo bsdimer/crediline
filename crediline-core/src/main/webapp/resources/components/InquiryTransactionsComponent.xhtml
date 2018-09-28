@@ -1,0 +1,245 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:components="http://java.sun.com/jsf/composite/components">
+
+<composite:interface>
+    <composite:attribute name="managedBean" required="true"/>
+    <composite:attribute name="uniqueIndex" required="true"/>
+</composite:interface>
+
+<composite:implementation>
+<h:panelGroup layout="block" style="float: left; width: 100%">
+
+<h:form id="mainContactsForm_#{cc.attrs.uniqueIndex}" style="width: 100%">
+<p:growl id="growl_#{cc.attrs.uniqueIndex}" showDetail="true" sticky="true"/>
+<p:messages id="messages_#{cc.attrs.uniqueIndex}" showDetail="true"/>
+<p:toolbar>
+    <f:facet name="left">
+        <p:commandButton title="#{msg['common.menu.search']}" icon="ui-icon-search"
+                         actionListener="#{cc.attrs.managedBean.search}"
+                         update="@form"/>
+        <p:commandButton title="#{msg['common.print']}" icon="ui-icon-print">
+            <p:printer target="mainContainer_#{cc.attrs.uniqueIndex}"/>
+        </p:commandButton>
+    </f:facet>
+</p:toolbar>
+
+
+<h:panelGroup layout="block" id="mainContainer_#{cc.attrs.uniqueIndex}"
+              style="margin-top: 10px; height: 100%">
+    <h:panelGroup layout="block" style="float: left; width: 25%; height: 100%">
+        <h:panelGroup layout="block" style="clear: both; height: 100%">
+
+            <p:fieldset legend="#{msg['common.credit.issuedIn']}"
+                        style="margin-top: 10px; margin-right: 10px">
+                <h:panelGrid columns="2" styleClass="grid">
+
+                    <h:outputText for="region_#{cc.attrs.uniqueIndex}"
+                                  value="#{msg['common.menu.region']}"
+                                  style="font-weight: bold"/>
+                    <p:selectOneMenu id="region_#{cc.attrs.uniqueIndex}" required="false" tabindex="1"
+                                     converter="#{regionConverter}"
+                                     label="#{msg['common.menu.region']}"
+                                     value="#{cc.attrs.managedBean.selectedRegion}">
+                        <f:selectItem itemLabel="#{msg['common.all']}" noSelectionOption="true" itemValue="#{null}"/>
+                        <f:selectItems value="#{autoComplete.allRegions}" var="region"
+                                       itemLabel="#{region.name}"
+                                       itemValue="#{region}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText for="officeReference_#{cc.attrs.uniqueIndex}"
+                                  value="#{msg['common.menu.office']}"
+                                  style="font-weight: bold"/>
+                    <p:selectOneMenu id="officeReference_#{cc.attrs.uniqueIndex}" required="false"
+                                     tabindex="4" converter="#{officeConverter}"
+                                     label="#{msg['common.menu.office']}"
+                                     value="#{cc.attrs.managedBean.selectedOffice}">
+                        <f:selectItem itemLabel="#{msg['common.all']}" noSelectionOption="true" itemValue="#{null}"/>
+                        <f:selectItems value="#{autoComplete.allOffices}" var="office"
+                                       itemLabel="#{office.name}"
+                                       itemValue="#{office}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText for="user_#{cc.attrs.uniqueIndex}"
+                                  value="#{msg['common.issuedFrom']}"
+                                  style="font-weight: bold"/>
+                    <p:selectOneMenu id="user_#{cc.attrs.uniqueIndex}" required="false" tabindex="1"
+                                     converter="#{userConverter}"
+                                     label="#{msg['common.issuedFrom']}"
+                                     value="#{cc.attrs.managedBean.issuer}">
+                        <f:selectItem itemLabel="#{msg['common.all']}" noSelectionOption="true" itemValue="#{null}"/>
+                        <f:selectItems value="#{autoComplete.allUsers}" var="user"
+                                       itemLabel="#{user.username}"
+                                       itemValue="#{user}"/>
+                    </p:selectOneMenu>
+
+                </h:panelGrid>
+            </p:fieldset>
+
+            <p:fieldset legend="#{msg['common.credit.timeParameters']}"
+                        style="margin-top: 10px; margin-right: 10px">
+                <h:panelGrid columns="2" styleClass="grid">
+
+                    <p:outputLabel for="issuedAfter_#{cc.attrs.uniqueIndex}"
+                                   value="#{msg['common.credit.issuedAfter']}"/>
+                    <p:calendar id="issuedAfter_#{cc.attrs.uniqueIndex}"
+                                value="#{cc.attrs.managedBean.issuedAfter}"
+                                pattern="dd/MM/yyyy" converter="dateConverter"
+                                showButtonPanel="true" navigator="true"
+                                mode="popup" showOn="button" popupIconOnly="true" tabindex="3"/>
+
+                    <p:outputLabel for="issuedBefore_#{cc.attrs.uniqueIndex}"
+                                   value="#{msg['common.credit.issuedBefore']}"/>
+                    <p:calendar id="issuedBefore_#{cc.attrs.uniqueIndex}"
+                                value="#{cc.attrs.managedBean.issuedBefore}"
+                                pattern="dd/MM/yyyy" converter="dateConverter"
+                                showButtonPanel="true" navigator="true"
+                                mode="popup" showOn="button" popupIconOnly="true" tabindex="2"/>
+
+                </h:panelGrid>
+            </p:fieldset>
+
+
+            <p:fieldset legend="#{msg['common.statistics']}"
+                        style="margin-top: 10px; margin-right: 10px; margin-bottom: 10px">
+                <h:panelGrid columns="2" styleClass="grid">
+                    <p:outputLabel value="#{msg['common.fullSumForPeriod']}"/>
+                    <h:outputText value="#{cc.attrs.managedBean.summary}"/>
+
+                    <p:outputLabel value="#{msg['common.incomesNumber']}"/>
+                    <h:outputText value="#{cc.attrs.managedBean.incomesNumber}"/>
+
+                    <p:outputLabel value="#{msg['common.outcomesNumber']}"/>
+                    <h:outputText value="#{cc.attrs.managedBean.outcomesNumber}"/>
+
+                    <p:outputLabel value="#{msg['common.incomesSum']}"/>
+                    <h:outputText value="#{cc.attrs.managedBean.incomesSum}"/>
+
+                    <p:outputLabel value="#{msg['common.outcomesSum']}"/>
+                    <h:outputText value="#{cc.attrs.managedBean.outcomesSum}"/>
+                </h:panelGrid>
+            </p:fieldset>
+            <p:commandButton title="#{msg['common.menu.search']}" icon="ui-icon-search"
+                             actionListener="#{cc.attrs.managedBean.search}" tabindex="9"
+                             value="#{msg['common.menu.search']}" style="margin-top: 10px; margin-bottom: 20px"
+                             update="@form"/>
+        </h:panelGroup>
+    </h:panelGroup>
+    <h:panelGroup layout="block" style="margin-top: 13px; float: left; width: 75%; height: 100%">
+        <h:panelGroup id="resultDiv_#{cc.attrs.uniqueIndex}" layout="block"
+                      style="clear: both; height: 100%">
+            <h:outputText style="margin: 20px 10px 15px;"
+                          value="#{msg['common.countResults']}: #{cc.attrs.managedBean.result.size()}"/>
+            <p:dataTable var="transaction" value="#{cc.attrs.managedBean.result}" scrollRows="20"
+                         scrollable="true" liveScroll="true" scrollHeight="530"
+                         lazy="true" style="margin-bottom: 10px"
+                         id="tableResult_#{cc.attrs.uniqueIndex}"
+                         widgetVar="resultTable_#{cc.attrs.uniqueIndex}"
+                         filteredValue="#{cc.attrs.managedBean.filteredTransactions}">
+
+                <p:column headerText="ID" width="40" sortBy="id">
+                    <h:outputText value="#{transaction.id}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['common.type']}" style="width: 40px" sortBy="flowType">
+                    <h:outputText
+                            value="#{msg['common.transaction.flowType.'.concat(transaction.flowType)]}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['common.credit.issuedFor']}" sortBy="reason">
+                    <h:outputText
+                            value="#{msg['common.transaction.reason.'.concat(transaction.reason)]}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['common.paymentMethod']}" style="width: 50px" sortBy="paymentMethod">
+                    <h:outputText
+                            value="#{msg['common.transaction.paymentMethod.'.concat(transaction.paymentMethod)]}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['common.credit.issuedAt']}" sortBy="creationDate">
+                    <h:outputText value="#{transaction.creationDate.toString('dd/MM/yyyy')}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['common.credit.issuedIn']}" sortBy="issuedIn">
+                    <h:outputText value="#{transaction.issuedIn.name}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['common.issuedFrom']}" sortBy="createdBy">
+                    <h:outputText value="#{transaction.createdBy.username}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['common.onCredit']}">
+                    <p:commandLink rendered="#{transaction.credit ne null}"
+                                   update="@form:creditDetailsPG_#{cc.attrs.uniqueIndex}"
+                                   oncomplete="PF('creditDetails_#{cc.attrs.uniqueIndex}').show()">
+                        <f:setPropertyActionListener value="#{transaction}"
+                                                     target="#{cc.attrs.managedBean.selectedTransaction}"/>
+                        <h:outputText value="#{transaction.credit.id}"/>
+                    </p:commandLink>
+                </p:column>
+
+                <p:column headerText="#{msg['common.sum']}" sortBy="sum">
+                    <h:outputText value="#{transaction.sum} "/>
+                </p:column>
+
+
+                <!--<p:column style="width:30px">
+                    <p:commandButton id="transactionDetailedViewButton_#{cc.attrs.uniqueIndex}"
+                                     update="@form"
+                                     oncomplete="PF('transactionDetails_#{cc.attrs.uniqueIndex}').show()"
+                                     icon="ui-icon-search"
+                                     title="View">
+                        <f:setPropertyActionListener value="#{transaction}"
+                                                     target="#{cc.attrs.managedBean.selectedTransaction}"/>
+                    </p:commandButton>
+                </p:column>-->
+
+            </p:dataTable>
+        </h:panelGroup>
+    </h:panelGroup>
+</h:panelGroup>
+
+
+<p:dialog id="dialogDetailsTransaction_#{cc.attrs.uniqueIndex}" header="#{msg['common.details']}"
+          widgetVar="transactionDetails_#{cc.attrs.uniqueIndex}"
+          resizable="true" showEffect="fade" hideEffect="explode" width="890" height="670"
+          closeOnEscape="true"
+          dynamic="true">
+
+    <h:panelGrid id="transactionDetailsPG_#{cc.attrs.uniqueIndex}" columns="2" cellpadding="4"
+                 style="margin:0 auto;">
+
+    </h:panelGrid>
+</p:dialog>
+
+<p:dialog id="dialogDetailsCredit_#{cc.attrs.uniqueIndex}" header="#{msg['common.details']}"
+          widgetVar="creditDetails_#{cc.attrs.uniqueIndex}"
+          resizable="true" showEffect="fade" hideEffect="explode" width="890" height="670" closeOnEscape="true"
+          dynamic="true">
+
+    <h:panelGrid id="creditDetailsPG_#{cc.attrs.uniqueIndex}" columns="2" cellpadding="4" style="margin:0 auto;">
+        <components:CreditViewComponent uniqueIndex="#{cc.attrs.uniqueIndex}"
+                                        credit="#{cc.attrs.managedBean.selectedTransaction.credit}"/>
+    </h:panelGrid>
+
+</p:dialog>
+
+<h:panelGroup layout="block" style="clear: both; width: 100%; margin-top: 20px">
+    <p:toolbar>
+        <f:facet name="left">
+            <p:commandButton title="#{msg['common.menu.search']}" icon="ui-icon-search"
+                             actionListener="#{cc.attrs.managedBean.search}"
+                             update="@form"/>
+            <p:commandButton title="#{msg['common.print']}" icon="ui-icon-print">
+                <p:printer target="mainContainer_#{cc.attrs.uniqueIndex}"/>
+            </p:commandButton>
+        </f:facet>
+    </p:toolbar>
+</h:panelGroup>
+</h:form>
+</h:panelGroup>
+</composite:implementation>
+
+</ui:component>

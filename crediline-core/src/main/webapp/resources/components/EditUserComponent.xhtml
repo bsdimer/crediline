@@ -1,0 +1,125 @@
+<ui:component xmlns=""
+              xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+              xmlns:f="http://xmlns.jcp.org/jsf/core"
+              xmlns:p="http://primefaces.org/ui"
+              xmlns:c="http://java.sun.com/jsp/jstl/core"
+              xmlns:composite="http://java.sun.com/jsf/composite"
+              xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <composite:interface>
+        <composite:attribute name="managedBean" required="true"/>
+        <composite:attribute name="uniqueIndex" required="true"/>
+    </composite:interface>
+
+    <composite:implementation>
+        <h:panelGroup layout="block">
+
+            <p:growl id="growl_#{cc.attrs.uniqueIndex}" showDetail="true" sticky="true"/>
+            <p:messages id="messages_#{cc.attrs.uniqueIndex}" showDetail="true"/>
+
+            <p:toolbar>
+                <f:facet name="left">
+                    <p:commandButton title="#{msg['common.menu.save']}" icon="ui-icon-disk"
+                                     actionListener="#{cc.attrs.managedBean.save}"
+                                     update="@form"/>
+                    <p:separator/>
+                    <p:commandButton title="#{msg['common.print']}" icon="ui-icon-print"/>
+                </f:facet>
+            </p:toolbar>
+
+            <p:fieldset legend="#{msg['common.main']}" style="margin-top: 10px;">
+
+                <h:panelGrid id="mainGrid_#{cc.attrs.uniqueIndex}" columns="2"
+                             columnClasses="label, value, message">
+
+                    <h:outputLabel for="userName_#{cc.attrs.uniqueIndex}" value="#{msg['login.username']}"/>
+                    <p:inputText id="userName_#{cc.attrs.uniqueIndex}" disabled="true"
+                                 label="#{msg['common.name']}"
+                                 value="#{cc.attrs.managedBean.user.username}">
+                    </p:inputText>
+
+                    <p:outputLabel for="userPassword_#{cc.attrs.uniqueIndex}" value="#{msg['login.password']}"/>
+                    <p:password id="userPassword_#{cc.attrs.uniqueIndex}"
+                                label="#{msg['login.password']}"
+                                value="#{cc.attrs.managedBean.user.password}">
+                    </p:password>
+
+                    <p:outputLabel for="role_#{cc.attrs.uniqueIndex}" value="#{msg['common.role']}"/>
+                    <h:selectOneMenu id="role_#{cc.attrs.uniqueIndex}" value="#{cc.attrs.managedBean.user.role}">
+                        <f:selectItems
+                                value="#{data.userRoles}"
+                                var="userRole"
+                                itemValue="#{userRole}"
+                                itemLabel="#{msg['user.role.'.concat(userRole)]}"/>
+                    </h:selectOneMenu>
+
+                    <p:outputLabel for="office_#{cc.attrs.uniqueIndex}" value="#{msg['common.menu.office']}"/>
+                    <h:selectOneMenu id="office_#{cc.attrs.uniqueIndex}" converter="#{officeConverter}"
+                                     value="#{cc.attrs.managedBean.user.office}">
+                        <f:selectItems
+                                value="#{cc.attrs.managedBean.offices}"
+                                var="office"
+                                itemValue="#{office}"
+                                itemLabel="#{office.name}"/>
+                    </h:selectOneMenu>
+
+                    <h:outputText for="personReference_#{cc.attrs.uniqueIndex}"
+                                  value="#{msg['common.menu.assosiedPerson']}"
+                                  style="font-weight: bold"/>
+                    <p:autoComplete id="personReference_#{cc.attrs.uniqueIndex}"
+                                    label="#{msg['common.menu.assosiedPerson']}"
+                                    queryDelay="1000"
+                                    value="#{cc.attrs.managedBean.user.person}" converter="#{personConverter}"
+                                    completeMethod="#{autoComplete.autoCompletePerson}" maxResults="10" var="p"
+                                    itemValue="#{p}" itemLabel="#{p.fullName}"
+                                    dropdown="false">
+
+                        <p:column headerText="#{msg['common.name']}">
+                            #{p.name} #{p.midname} #{p.surname}
+                        </p:column>
+
+                        <p:column>
+                            #{p.egn}
+                        </p:column>
+
+                        <p:column>
+                            #{p.addresses[0].city}
+                        </p:column>
+
+                        <p:column>
+                            #{p.addresses[0].street}
+                        </p:column>
+
+                        <p:column>
+                            #{p.addresses[0].number}
+                        </p:column>
+
+                        <p:column>
+                            #{p.addresses[0].entrance}
+                        </p:column>
+
+                        <p:column>
+                            #{p.addresses[0].floor}
+                        </p:column>
+
+                        <p:column>
+                            #{p.addresses[0].apartment}
+                        </p:column>
+                    </p:autoComplete>
+                </h:panelGrid>
+
+            </p:fieldset>
+
+            <p:toolbar>
+                <f:facet name="left">
+                    <p:commandButton title="#{msg['common.menu.save']}" icon="ui-icon-disk"
+                                     actionListener="#{cc.attrs.managedBean.save}" update="@form"/>
+                    <p:separator/>
+                    <p:commandButton title="#{msg['common.print']}" icon="ui-icon-print"/>
+                </f:facet>
+            </p:toolbar>
+
+        </h:panelGroup>
+    </composite:implementation>
+
+</ui:component>
